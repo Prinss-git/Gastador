@@ -38,3 +38,6 @@ Thumbs.db
 
 # Vite
 *.local
+
+# One-time scripts
+gen-icons.cjs

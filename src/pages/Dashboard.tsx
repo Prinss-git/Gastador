@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useExpenses } from '../hooks/useExpenses'
+import { useIncome } from '../hooks/useIncome'
 import { useInsights } from '../hooks/useInsights'
 import { useExpenseStore } from '../store/expenseStore'
 import { useAuth } from '../hooks/useAuth'
@@ -14,14 +15,16 @@ const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const { expenses, budget, deleteExpense } = useExpenses()
+  const { expenses, deleteExpense } = useExpenses()
+  const { income } = useIncome()
   const { selectedMonth } = useExpenseStore()
   const { insights, loading: insightsLoading, loadInsights } = useInsights()
 
-  const total = expenses.reduce((s, e) => s + e.amount, 0)
-  const allowance = budget.limit
-  const remaining = allowance - total
-  const pct = allowance > 0 ? Math.min((total / allowance) * 100, 100) : 0
+  const totalSpent = expenses.reduce((s, e) => s + e.amount, 0)
+  const totalIncome = income.reduce((s, e) => s + e.amount, 0)
+  const hasIncome = totalIncome > 0
+  const balance = totalIncome - totalSpent
+  const pct = totalIncome > 0 ? Math.min((totalSpent / totalIncome) * 100, 100) : 0
   const [year, month] = selectedMonth.split('-').map(Number)
 
   const categoryTotals = useMemo(() => {
@@ -30,10 +33,11 @@ export default function Dashboard() {
     return Object.entries(map).sort((a, b) => b[1] - a[1]) as [Category, number][]
   }, [expenses])
 
+  const total = totalSpent // keep alias for insights call below
   const recent = expenses.slice(0, 5)
 
   useEffect(() => {
-    if (expenses.length > 0) loadInsights(selectedMonth, expenses, total, budget.limit, 0)
+    if (expenses.length > 0) loadInsights(selectedMonth, expenses, totalSpent, totalIncome, 0)
   }, [selectedMonth]) // eslint-disable-line
 
   const username = user?.email?.split('@')[0] ?? 'there'
@@ -61,38 +65,52 @@ export default function Dashboard() {
 
         {/* Balance */}
         <div className="relative mb-6">
-          {allowance > 0 ? (
+          {hasIncome ? (
             <>
               <p className="text-text-3 text-xs font-medium mb-2">
-                {remaining >= 0 ? 'Remaining' : 'Over budget'}
+                {balance >= 0 ? 'Remaining Balance' : 'Over Allowance'}
               </p>
-              <p className={`font-bold tracking-tight ${remaining < 0 ? 'text-danger' : 'text-text-1'}`}
+              <p className={`font-bold tracking-tight ${balance < 0 ? 'text-danger' : 'text-text-1'}`}
                 style={{ fontSize: 'clamp(2rem, 10vw, 3rem)' }}>
-                {remaining < 0 ? '-' : ''}₱{Math.abs(remaining).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {balance < 0 ? '-' : ''}₱{Math.abs(balance).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
-              <p className="text-text-3 text-xs mt-1.5">
-                ₱{total.toLocaleString('en-PH', { maximumFractionDigits: 0 })} spent of ₱{allowance.toLocaleString()} allowance
-              </p>
+              {/* Income / Spent row */}
+              <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0" />
+                  <span className="text-text-3 text-xs">
+                    ₱{totalIncome.toLocaleString('en-PH', { maximumFractionDigits: 0 })} in
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-danger flex-shrink-0" />
+                  <span className="text-text-3 text-xs">
+                    ₱{totalSpent.toLocaleString('en-PH', { maximumFractionDigits: 0 })} out
+                  </span>
+                </div>
+              </div>
             </>
           ) : (
             <>
               <p className="text-text-3 text-xs font-medium mb-2">Total Spent</p>
               <p className="text-text-1 font-bold tracking-tight" style={{ fontSize: 'clamp(2rem, 10vw, 3rem)' }}>
-                ₱{total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₱{totalSpent.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
-              <p className="text-text-3 text-xs mt-1.5">Set your allowance in Profile to track your balance</p>
+              <p className="text-text-3 text-xs mt-1.5">
+                Tap + → Allowance to log your balance
+              </p>
             </>
           )}
         </div>
 
-        {/* Allowance progress bar */}
-        {allowance > 0 && (
+        {/* Progress bar — shown when income is tracked */}
+        {hasIncome && (
           <div className="relative">
             <div className="h-1.5 rounded-full bg-border overflow-hidden">
               <div className="h-full rounded-full transition-all duration-700"
                 style={{ width: `${pct}%`, backgroundColor: pct >= 100 ? '#F87171' : pct >= 80 ? '#FBBF24' : '#7C6FFF' }} />
             </div>
-            <p className="text-text-3 text-xs mt-1.5 text-right">{pct.toFixed(0)}% used</p>
+            <p className="text-text-3 text-xs mt-1.5 text-right">{pct.toFixed(0)}% spent</p>
           </div>
         )}
       </div>

@@ -11,6 +11,14 @@ export interface Expense {
   aiCategorized: boolean
 }
 
+export interface IncomeEntry {
+  id: string
+  description: string
+  amount: number
+  date: Date
+  notes: string
+}
+
 export interface Budget {
   limit: number
   spent: number
@@ -18,11 +26,15 @@ export interface Budget {
 
 interface ExpenseState {
   expenses: Expense[]
+  income: IncomeEntry[]
   budget: Budget
-  selectedMonth: string // 'YYYY-MM'
+  selectedMonth: string
   setExpenses: (expenses: Expense[]) => void
   addExpense: (expense: Expense) => void
   removeExpense: (id: string) => void
+  setIncome: (income: IncomeEntry[]) => void
+  addIncomeEntry: (entry: IncomeEntry) => void
+  removeIncomeEntry: (id: string) => void
   setBudget: (budget: Budget) => void
   setSelectedMonth: (month: string) => void
 }
@@ -34,13 +46,15 @@ const currentMonth = () => {
 
 export const useExpenseStore = create<ExpenseState>((set) => ({
   expenses: [],
-  budget: { limit: 10000, spent: 0 },
+  income: [],
+  budget: { limit: 0, spent: 0 },
   selectedMonth: currentMonth(),
   setExpenses: (expenses) => set({ expenses }),
-  addExpense: (expense) =>
-    set((state) => ({ expenses: [expense, ...state.expenses] })),
-  removeExpense: (id) =>
-    set((state) => ({ expenses: state.expenses.filter((e) => e.id !== id) })),
+  addExpense: (expense) => set((s) => ({ expenses: [expense, ...s.expenses] })),
+  removeExpense: (id) => set((s) => ({ expenses: s.expenses.filter((e) => e.id !== id) })),
+  setIncome: (income) => set({ income }),
+  addIncomeEntry: (entry) => set((s) => ({ income: [entry, ...s.income] })),
+  removeIncomeEntry: (id) => set((s) => ({ income: s.income.filter((e) => e.id !== id) })),
   setBudget: (budget) => set({ budget }),
   setSelectedMonth: (month) => set({ selectedMonth: month }),
 }))

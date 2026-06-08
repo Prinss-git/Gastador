@@ -1,9 +1,34 @@
 import { useState, useMemo } from 'react'
 import { useExpenses } from '../hooks/useExpenses'
+import { useIncome } from '../hooks/useIncome'
 import { useExpenseStore } from '../store/expenseStore'
 import { ExpenseCard } from '../components/ExpenseCard'
 import { MonthPicker } from '../components/MonthPicker'
 import { CATEGORIES, type Category } from '../constants/categories'
+import type { IncomeEntry } from '../store/expenseStore'
+
+function IncomeRow({ entry, onDelete }: { entry: IncomeEntry; onDelete: (id: string) => void }) {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3.5 bg-bg-elevated">
+      <div className="w-0.5 self-stretch rounded-full flex-shrink-0 my-0.5 bg-success" />
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 bg-success/10">
+        💰
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-text-1 font-medium text-sm truncate">{entry.description}</p>
+        <p className="text-text-3 text-xs mt-0.5">Allowance · {entry.date.toLocaleDateString('en-PH', { month: 'short', day: 'numeric' })}</p>
+      </div>
+      <div className="flex items-center gap-2">
+        <p className="text-success font-semibold text-sm">+₱{entry.amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        <button onClick={() => onDelete(entry.id)} className="text-text-3 hover:text-danger transition-colors p-1">
+          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M9 6V4h6v2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function formatGroupDate(date: Date): string {
   const now = new Date()
@@ -17,28 +42,48 @@ function formatGroupDate(date: Date): string {
 
 export default function History() {
   const { expenses, deleteExpense } = useExpenses()
+  const { income, deleteIncome } = useIncome()
   const { selectedMonth } = useExpenseStore()
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState<Category | null>(null)
 
-  const filtered = useMemo(() =>
+  const filteredExpenses = useMemo(() =>
     expenses.filter((e) => {
       const matchSearch = e.description.toLowerCase().includes(search.toLowerCase())
       const matchCat = !filterCategory || e.category === filterCategory
       return matchSearch && matchCat
     }), [expenses, search, filterCategory])
 
+  const filteredIncome = useMemo(() =>
+    !filterCategory
+      ? income.filter((e) => e.description.toLowerCase().includes(search.toLowerCase()))
+      : [], [income, search, filterCategory])
+
+  // Merge into unified list with a type tag, sorted by date desc
+  type Row =
+    | { kind: 'expense'; data: typeof filteredExpenses[0] }
+    | { kind: 'income'; data: typeof filteredIncome[0] }
+
+  const allRows = useMemo((): Row[] => {
+    const rows: Row[] = [
+      ...filteredExpenses.map((e) => ({ kind: 'expense' as const, data: e })),
+      ...filteredIncome.map((e) => ({ kind: 'income' as const, data: e })),
+    ]
+    return rows.sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  }, [filteredExpenses, filteredIncome])
+
   const grouped = useMemo(() => {
-    const groups: Record<string, typeof filtered> = {}
-    for (const e of filtered) {
-      const key = formatGroupDate(e.date)
+    const groups: Record<string, Row[]> = {}
+    for (const row of allRows) {
+      const key = formatGroupDate(row.data.date)
       if (!groups[key]) groups[key] = []
-      groups[key].push(e)
+      groups[key].push(row)
     }
     return groups
-  }, [filtered])
+  }, [allRows])
 
-  const total = filtered.reduce((s, e) => s + e.amount, 0)
+  const totalSpent = filteredExpenses.reduce((s, e) => s + e.amount, 0)
+  const totalIncome = filteredIncome.reduce((s, e) => s + e.amount, 0)
 
   return (
     <div className="pb-40 min-h-screen bg-bg overflow-x-hidden animate-fade-in">
@@ -94,40 +139,59 @@ export default function History() {
         {Object.keys(grouped).length === 0 ? (
           <div className="bg-bg-elevated rounded-2xl border border-border p-10 flex flex-col items-center text-center">
             <p className="text-4xl mb-3">📭</p>
-            <p className="text-text-1 font-semibold text-sm">No expenses found</p>
+            <p className="text-text-1 font-semibold text-sm">No entries found</p>
             <p className="text-text-3 text-xs mt-1">
-              {search || filterCategory ? 'Try a different filter' : 'Add your first expense'}
+              {search || filterCategory ? 'Try a different filter' : 'Add your first expense or allowance'}
             </p>
           </div>
         ) : (
-          Object.entries(grouped).map(([group, items]) => (
+          Object.entries(grouped).map(([group, rows]) => (
             <div key={group}>
-              {/* Date group header */}
               <div className="flex items-center justify-between mb-2 px-1">
                 <p className="text-text-3 text-xs font-semibold">{group}</p>
                 <p className="text-text-3 text-xs">
-                  ₱{items.reduce((s, e) => s + e.amount, 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {rows.some(r => r.kind === 'income') && (
+                    <span className="text-success mr-2">
+                      +₱{rows.filter(r => r.kind === 'income').reduce((s, r) => s + r.data.amount, 0).toLocaleString('en-PH', { maximumFractionDigits: 0 })}
+                    </span>
+                  )}
+                  -₱{rows.filter(r => r.kind === 'expense').reduce((s, r) => s + r.data.amount, 0).toLocaleString('en-PH', { maximumFractionDigits: 0 })}
                 </p>
               </div>
-              {/* Rows */}
               <div className="bg-bg-elevated rounded-2xl border border-border overflow-hidden divide-y divide-border/50">
-                {items.map((e) => <ExpenseCard key={e.id} expense={e} onDelete={deleteExpense} />)}
+                {rows.map((row) =>
+                  row.kind === 'expense' ? (
+                    <ExpenseCard key={row.data.id} expense={row.data} onDelete={deleteExpense} />
+                  ) : (
+                    <IncomeRow key={row.data.id} entry={row.data} onDelete={deleteIncome} />
+                  )
+                )}
               </div>
             </div>
           ))
         )}
       </div>
 
-      {/* Pinned total bar */}
-      {filtered.length > 0 && (
+      {/* Pinned summary bar */}
+      {allRows.length > 0 && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-app px-5 pointer-events-none z-40">
-          <div className="bg-bg-overlay/95 backdrop-blur-xl rounded-2xl border border-border py-3 px-5 flex justify-between items-center shadow-large">
-            <span className="text-text-2 text-sm font-medium">
-              {filtered.length} transaction{filtered.length !== 1 ? 's' : ''}
-            </span>
-            <span className="text-text-1 font-bold text-sm">
-              ₱{total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
+          <div className="bg-bg-overlay/95 backdrop-blur-xl rounded-2xl border border-border py-3 px-4 flex items-center justify-between gap-2 shadow-large">
+            <span className="text-text-3 text-xs">{allRows.length} entries</span>
+            <div className="flex items-center gap-3">
+              {totalIncome > 0 && (
+                <span className="text-success text-xs font-semibold">
+                  +₱{totalIncome.toLocaleString('en-PH', { maximumFractionDigits: 0 })}
+                </span>
+              )}
+              <span className="text-danger text-xs font-semibold">
+                -₱{totalSpent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}
+              </span>
+              {totalIncome > 0 && (
+                <span className={`text-sm font-bold ${totalIncome - totalSpent >= 0 ? 'text-text-1' : 'text-danger'}`}>
+                  = ₱{Math.abs(totalIncome - totalSpent).toLocaleString('en-PH', { maximumFractionDigits: 0 })}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -58,7 +58,7 @@ export default function AddExpense() {
   }
 
   return (
-    <div className="pb-32 animate-fade-in">
+    <div className="pb-32 animate-fade-in overflow-x-hidden">
       {/* Header */}
       <div className="relative overflow-hidden px-4 pt-12 pb-6"
         style={{ background: 'linear-gradient(180deg, rgba(108,99,255,0.1) 0%, transparent 100%)' }}>

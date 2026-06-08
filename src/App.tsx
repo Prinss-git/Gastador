@@ -10,7 +10,7 @@ import Login from './pages/Login'
 function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-app w-full min-h-screen relative">
+      <div className="mx-auto max-w-app w-full min-h-screen relative overflow-x-hidden">
         {children}
         <Navbar />
       </div>

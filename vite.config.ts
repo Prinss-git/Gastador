@@ -7,13 +7,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/*.png', 'favicon.ico'],
+      includeAssets: ['icons/*.png', 'logo.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Gastador',
         short_name: 'Gastador',
         description: 'AI-powered expense tracker for Filipinos',
-        theme_color: '#6C63FF',
-        background_color: '#0F0F1A',
+        theme_color: '#7C6FFF',
+        background_color: '#111118',
         display: 'standalone',
         start_url: '/',
         scope: '/',

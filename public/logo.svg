@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C6FFF"/>
+      <stop offset="100%" stop-color="#5B4FCC"/>
+    </linearGradient>
+    <linearGradient id="glyph" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E0DEFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+
+  <!-- Subtle inner highlight -->
+  <rect x="0" y="0" width="512" height="256" rx="120" fill="white" fill-opacity="0.06"/>
+
+  <!-- G lettermark -->
+  <!-- Outer arc of G -->
+  <path d="
+    M 256 96
+    C 163 96 88 171 88 264
+    C 88 357 163 432 256 432
+    C 330 432 393 384 414 316
+    L 414 260
+    L 260 260
+    L 260 308
+    L 358 308
+    C 341 348 302 376 256 376
+    C 193 376 142 325 142 264
+    C 142 203 193 152 256 152
+    C 290 152 320 166 341 190
+    L 381 152
+    C 349 118 304 96 256 96
+    Z
+  " fill="url(#glyph)"/>
+</svg>

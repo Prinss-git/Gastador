@@ -13,7 +13,7 @@ export default function AddExpense() {
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState<Category | null>(null)
   const [categoryLoading, setCategoryLoading] = useState(false)
-  const [showCategoryPicker, setShowCategoryPicker] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
@@ -22,7 +22,6 @@ export default function AddExpense() {
 
   useEffect(() => {
     if (!description.trim() || !amount) return
-
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       setCategoryLoading(true)
@@ -33,7 +32,6 @@ export default function AddExpense() {
         setCategoryLoading(false)
       }
     }, 600)
-
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [description, amount])
 
@@ -41,7 +39,6 @@ export default function AddExpense() {
     if (!description.trim()) return toast.error('Add a description')
     if (!amount || parseFloat(amount) <= 0) return toast.error('Enter a valid amount')
     if (!category) return toast.error('Category is required')
-
     setSaving(true)
     try {
       await saveExpense({
@@ -54,61 +51,54 @@ export default function AddExpense() {
       })
       setSaved(true)
       toast.success('Expense saved!')
-      setTimeout(() => navigate('/'), 800)
+      setTimeout(() => navigate('/'), 700)
     } catch {
       setSaving(false)
     }
   }
 
   return (
-    <div className="pb-24 px-4 pt-6 animate-fade-in">
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate(-1)} className="text-text-muted hover:text-white transition-colors">
-          ←
-        </button>
-        <h1 className="text-xl font-bold text-white">Add Expense</h1>
+    <div className="pb-32 animate-fade-in">
+      {/* Header */}
+      <div className="relative overflow-hidden px-4 pt-12 pb-6"
+        style={{ background: 'linear-gradient(180deg, rgba(108,99,255,0.1) 0%, transparent 100%)' }}>
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)}
+            className="w-9 h-9 rounded-xl bg-card border border-border/50 flex items-center justify-center text-text-muted hover:text-text-primary transition-all">
+            ←
+          </button>
+          <h1 className="text-xl font-bold text-text-primary">Add Expense</h1>
+        </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="px-4 space-y-3">
         {/* Description */}
-        <div className="bg-card rounded-2xl p-4">
-          <label className="block text-text-muted text-xs font-medium mb-2">Description</label>
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="e.g. Jollibee lunch, Grab to work"
-            className="w-full bg-transparent text-white text-base outline-none placeholder:text-text-muted"
-            autoFocus
-          />
+        <div className="bg-card rounded-2xl p-4 border border-border/50">
+          <label className="block text-text-muted text-xs font-bold mb-2 uppercase tracking-widest">Description</label>
+          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)}
+            placeholder="e.g. Jollibee lunch, Grab to work…"
+            className="w-full bg-transparent text-text-primary text-base outline-none placeholder:text-text-muted"
+            autoFocus />
         </div>
 
         {/* Amount */}
-        <div className="bg-card rounded-2xl p-4">
-          <label className="block text-text-muted text-xs font-medium mb-2">Amount</label>
+        <div className="bg-card rounded-2xl p-4 border border-border/50">
+          <label className="block text-text-muted text-xs font-bold mb-2 uppercase tracking-widest">Amount</label>
           <div className="flex items-center gap-2">
-            <span className="text-primary text-xl font-bold">₱</span>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-              className="flex-1 bg-transparent text-white text-2xl font-bold outline-none placeholder:text-white/20"
-            />
+            <span className="text-2xl font-bold gradient-text">₱</span>
+            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00" min="0" step="0.01"
+              className="flex-1 bg-transparent text-text-primary text-3xl font-bold outline-none placeholder:text-text-muted/30" />
           </div>
         </div>
 
         {/* Category */}
-        <div className="bg-card rounded-2xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-text-muted text-xs font-medium">Category</label>
-            {category && (
-              <button
-                onClick={() => setShowCategoryPicker(!showCategoryPicker)}
-                className="text-primary text-xs"
-              >
+        <div className="bg-card rounded-2xl p-4 border border-border/50">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-text-muted text-xs font-bold uppercase tracking-widest">Category</label>
+            {category && !showPicker && (
+              <button onClick={() => setShowPicker(true)}
+                className="text-primary text-xs font-semibold px-2 py-1 rounded-lg bg-primary/10">
                 Change
               </button>
             )}
@@ -117,80 +107,64 @@ export default function AddExpense() {
           {categoryLoading ? (
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="text-text-muted text-sm">Categorizing…</span>
+              <span className="text-text-muted text-sm">AI categorizing…</span>
             </div>
-          ) : category ? (
+          ) : !category || showPicker ? (
             <div>
-              <button onClick={() => setShowCategoryPicker(!showCategoryPicker)}>
-                <CategoryBadge category={category} />
-              </button>
+              {!category && !showPicker && (
+                <button onClick={() => setShowPicker(true)} className="text-primary text-sm font-semibold">
+                  + Select category
+                </button>
+              )}
+              {showPicker && (
+                <div className="grid grid-cols-3 gap-2">
+                  {CATEGORIES.map((cat) => (
+                    <button key={cat} onClick={() => { setCategory(cat); setShowPicker(false) }}
+                      className={`rounded-xl py-2 px-2 text-xs font-medium transition-all ${
+                        category === cat ? 'ring-2 ring-primary scale-95' : 'hover:scale-95'
+                      }`}
+                      style={{ backgroundColor: category === cat ? 'rgba(108,99,255,0.2)' : 'rgba(255,255,255,0.03)' }}>
+                      <CategoryBadge category={cat} size="sm" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
-            <button
-              onClick={() => setShowCategoryPicker(true)}
-              className="text-primary text-sm"
-            >
-              Select category
+            <button onClick={() => setShowPicker(true)} className="animate-scale-in">
+              <CategoryBadge category={category} />
             </button>
-          )}
-
-          {showCategoryPicker && (
-            <div className="grid grid-cols-3 gap-2 mt-3">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => { setCategory(cat); setShowCategoryPicker(false) }}
-                  className={`rounded-xl py-2 px-3 text-xs font-medium transition-all ${
-                    category === cat ? 'ring-2 ring-primary' : ''
-                  }`}
-                  style={{
-                    backgroundColor: category === cat ? '#6C63FF22' : '#0F0F1A',
-                  }}
-                >
-                  <CategoryBadge category={cat} size="sm" />
-                </button>
-              ))}
-            </div>
           )}
         </div>
 
         {/* Date */}
-        <div className="bg-card rounded-2xl p-4">
-          <label className="block text-text-muted text-xs font-medium mb-2">Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+        <div className="bg-card rounded-2xl p-4 border border-border/50">
+          <label className="block text-text-muted text-xs font-bold mb-2 uppercase tracking-widest">Date</label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
             max={new Date().toISOString().slice(0, 10)}
-            className="w-full bg-transparent text-white outline-none"
-          />
+            className="w-full bg-transparent text-text-primary outline-none text-sm" />
         </div>
 
         {/* Notes */}
-        <div className="bg-card rounded-2xl p-4">
-          <label className="block text-text-muted text-xs font-medium mb-2">Notes (optional)</label>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Any additional details…"
-            rows={2}
-            className="w-full bg-transparent text-white text-sm outline-none resize-none placeholder:text-text-muted"
-          />
+        <div className="bg-card rounded-2xl p-4 border border-border/50">
+          <label className="block text-text-muted text-xs font-bold mb-2 uppercase tracking-widest">Notes (optional)</label>
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
+            placeholder="Any details…" rows={2}
+            className="w-full bg-transparent text-text-primary text-sm outline-none resize-none placeholder:text-text-muted" />
         </div>
 
         {/* Save button */}
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className={`w-full py-4 rounded-2xl font-bold text-white text-base transition-all ${
-            saved
-              ? 'bg-green-500'
-              : saving
-              ? 'bg-primary/60'
-              : 'bg-primary hover:bg-primary-dark active:scale-95'
+        <button onClick={handleSave} disabled={saving}
+          className={`w-full py-4 rounded-2xl font-bold text-white text-base transition-all active:scale-95 ${
+            saved ? 'bg-success' : saving ? 'opacity-60' : 'shadow-glow'
           }`}
-        >
-          {saved ? '✓ Saved!' : saving ? 'Saving…' : 'Save Expense'}
+          style={!saved ? { background: 'linear-gradient(135deg, #6C63FF 0%, #FF6B9D 100%)' } : {}}>
+          {saved ? '✓ Saved!' : saving ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Saving…
+            </span>
+          ) : 'Save Expense'}
         </button>
       </div>
     </div>

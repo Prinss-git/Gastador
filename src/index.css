@@ -10,19 +10,22 @@
 
   html {
     font-family: 'Inter', system-ui, sans-serif;
-    background-color: #0F0F1A;
-    color: #ffffff;
+    background-color: #0A0A14;
+    color: #F0F0FF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   input[type='date']::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    opacity: 0.5;
+    filter: invert(0.7);
   }
 
   input[type='number']::-webkit-outer-spin-button,
@@ -35,9 +38,37 @@
     -moz-appearance: textfield;
   }
 
-  /* Safe area padding for iOS */
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+  ::selection {
+    background: rgba(108, 99, 255, 0.35);
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(26, 26, 46, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-strong {
+    background: rgba(18, 18, 31, 0.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #6C63FF 0%, #FF6B9D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(90deg, #1A1A2E 25%, #22223E 50%, #1A1A2E 75%);
+    background-size: 400px 100%;
+    animation: shimmer 2s infinite;
   }
 }
 
@@ -48,5 +79,13 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
   }
 }

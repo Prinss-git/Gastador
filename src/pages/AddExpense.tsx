@@ -28,6 +28,9 @@ export default function AddExpense() {
       try {
         const cat = await categorizeExpense(description, parseFloat(amount) || 0)
         setCategory(cat)
+      } catch {
+        // fallback: keyword categorizer already tried inside categorizeExpense
+        setCategory('Others')
       } finally {
         setCategoryLoading(false)
       }
@@ -38,13 +41,13 @@ export default function AddExpense() {
   const handleSave = async () => {
     if (!description.trim()) return toast.error('Add a description')
     if (!amount || parseFloat(amount) <= 0) return toast.error('Enter a valid amount')
-    if (!category) return toast.error('Category is required')
+    const finalCategory = category ?? 'Others'
     setSaving(true)
     try {
       await saveExpense({
         description: description.trim(),
         amount: parseFloat(parseFloat(amount).toFixed(2)),
-        category,
+        category: finalCategory,
         date: new Date(date + 'T12:00:00'),
         notes: notes.trim() || undefined,
         aiCategorized: true,

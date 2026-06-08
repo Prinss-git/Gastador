@@ -50,24 +50,33 @@ export default function Dashboard() {
   return (
     <div className="pb-36 min-h-screen bg-bg animate-fade-in overflow-x-hidden">
 
+      {/* ── Top bar ── */}
+      <div className="flex items-center justify-between px-5 pt-12 pb-2">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center text-sm shadow-primary-sm">💸</div>
+          <span className="text-text-1 font-bold text-base tracking-tight">Gastador</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <MonthPicker />
+          <Link to="/profile"
+            className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-xs shadow-primary-sm flex-shrink-0">
+            {initial}
+          </Link>
+        </div>
+      </div>
+
       {/* ── Hero ── */}
-      <div className="relative px-5 pt-14 pb-8 overflow-hidden">
+      <div className="relative px-5 pt-4 pb-8 overflow-hidden">
         {/* Atmospheric orbs */}
         <div className="absolute -top-10 -right-10 w-72 h-72 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 -left-10 w-48 h-48 rounded-full bg-coral/6 blur-3xl pointer-events-none" />
 
-        {/* Top row */}
-        <div className="relative flex items-center justify-between mb-8">
-          <div>
-            <p className="text-text-1 text-base font-semibold">{greeting}</p>
-            <p className="text-text-3 text-xs mt-0.5">
-              {new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' })}
-            </p>
-          </div>
-          <Link to="/profile"
-            className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm shadow-primary-sm">
-            {initial}
-          </Link>
+        {/* Greeting */}
+        <div className="relative mb-6">
+          <p className="text-text-1 text-lg font-semibold">{greeting}</p>
+          <p className="text-text-3 text-xs mt-0.5">
+            {new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
         </div>
 
         {/* Balance */}
@@ -120,15 +129,6 @@ export default function Dashboard() {
             <p className="text-text-3 text-xs mt-1.5 text-right">{pct.toFixed(0)}% spent</p>
           </div>
         )}
-      </div>
-
-      {/* ── Month picker ── */}
-      <div className="flex items-center justify-between px-5 mb-5">
-        <MonthPicker />
-        <Link to="/add"
-          className="text-xs font-semibold text-primary">
-          + Add expense
-        </Link>
       </div>
 
       {/* ── Category totals strip ── */}

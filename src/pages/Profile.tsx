@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useExpenses } from '../hooks/useExpenses'
 import { useExpenseStore } from '../store/expenseStore'
+import { useInstallPrompt } from '../hooks/useInstallPrompt'
 import { toast } from 'react-hot-toast'
 
 const VERSION = '1.0.0'
@@ -24,6 +25,7 @@ export default function Profile() {
   const [budgetInput, setBudgetInput] = useState(String(budget.limit))
   const [editingBudget, setEditingBudget] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
+  const { install, showBanner, isIOS, isInstalled } = useInstallPrompt()
 
   const initials = (user?.email?.slice(0, 2) ?? 'GU').toUpperCase()
   const email = user?.email ?? ''
@@ -128,7 +130,22 @@ export default function Profile() {
           <RowItem label="Version" value={VERSION} />
           <RowItem label="AI Model" value="Llama 3 · Groq" />
           <RowItem label="Database" value="Firebase Firestore" />
+          <RowItem label="Install status" value={isInstalled ? 'Installed ✓' : 'Not installed'} />
         </div>
+
+        {/* Install button — only shown when prompt is available and not yet installed */}
+        {showBanner && !isIOS && (
+          <button onClick={install}
+            className="w-full py-3.5 rounded-2xl text-sm font-semibold text-primary border border-primary/30 bg-primary/8
+                       transition-all active:scale-[0.98]">
+            Install Gastador App
+          </button>
+        )}
+        {showBanner && isIOS && (
+          <div className="rounded-2xl border border-border bg-bg-elevated px-4 py-3.5 text-center">
+            <p className="text-text-2 text-sm">To install: tap Share → "Add to Home Screen"</p>
+          </div>
+        )}
 
         {/* Sign out */}
         <button onClick={async () => { setSigningOut(true); await signOut() }}

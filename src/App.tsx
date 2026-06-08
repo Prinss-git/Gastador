@@ -11,7 +11,7 @@ import Login from './pages/Login'
 function AppShell({ children }: { children: React.ReactNode }) {
   return (
     // Outer: full viewport with branded desktop background
-    <div className="min-h-screen bg-[#0A0A12] flex justify-center relative"
+    <div className="min-h-screen bg-[#0A0A12] flex justify-center relative overflow-x-hidden"
       style={{
         backgroundImage: 'radial-gradient(circle, rgba(124,111,255,0.06) 1px, transparent 1px)',
         backgroundSize: '28px 28px',

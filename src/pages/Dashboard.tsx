@@ -9,6 +9,7 @@ import { MonthPicker } from '../components/MonthPicker'
 import { ExpenseCard } from '../components/ExpenseCard'
 import { InsightCard } from '../components/InsightCard'
 import { SkeletonCard } from '../components/SkeletonLoader'
+import { InstallBanner } from '../components/InstallBanner'
 import { CATEGORY_EMOJIS, type Category } from '../constants/categories'
 
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -145,6 +146,9 @@ export default function Dashboard() {
           ))}
         </div>
       )}
+
+      {/* ── Install prompt ── */}
+      <InstallBanner />
 
       {/* ── Recent transactions ── */}
       <div className="px-5 mb-2 flex items-center justify-between">

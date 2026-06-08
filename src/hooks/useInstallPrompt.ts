@@ -21,6 +21,9 @@ export function useInstallPrompt() {
 
     const handler = (e: Event) => {
       e.preventDefault()
+      // If browser offers the prompt again, reset dismiss so banner reappears
+      setIsDismissed(false)
+      localStorage.removeItem('pwa-dismissed')
       setInstallPrompt(e as BeforeInstallPromptEvent)
     }
 

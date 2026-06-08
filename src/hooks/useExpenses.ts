@@ -79,8 +79,12 @@ export function useExpenses() {
       if (!user) return
       try {
         const docRef = await addDoc(collection(db, 'users', user.uid, 'expenses'), {
-          ...data,
+          description: data.description,
+          amount: data.amount,
+          category: data.category,
           date: Timestamp.fromDate(data.date),
+          notes: data.notes ?? '',
+          aiCategorized: data.aiCategorized,
         })
         addExpense({ ...data, id: docRef.id })
 

@@ -2,11 +2,13 @@ import json
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Any
-import anthropic
+import google.generativeai as genai
 import os
 
 router = APIRouter()
-client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 
 class ExpenseItem(BaseModel):
@@ -35,7 +37,6 @@ class InsightItem(BaseModel):
 
 @router.post("/insights", response_model=list[InsightItem])
 async def insights(req: InsightsRequest):
-    # Build category breakdown
     breakdown: dict[str, float] = {}
     for e in req.expenses:
         breakdown[e.category] = breakdown.get(e.category, 0) + e.amount
@@ -48,7 +49,7 @@ async def insights(req: InsightsRequest):
     top5_str = "\n".join(f"- {e.description} ({e.category}): ₱{e.amount:.2f}" for e in top5)
 
     prompt = (
-        f"The user's name is Gastador user. They spent ₱{req.total:.2f} in {req.month} "
+        f"The user spent ₱{req.total:.2f} in {req.month} "
         f"against a ₱{req.budget:.2f} budget.\n"
         f"Breakdown: {breakdown_str}.\n"
         f"Top 5 expenses:\n{top5_str}\n"
@@ -59,13 +60,8 @@ async def insights(req: InsightsRequest):
         'Return ONLY a JSON array: [{"title": string, "body": string, "emoji": string}]'
     )
 
-    message = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=512,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = message.content[0].text.strip()
+    response = model.generate_content(prompt)
+    raw = response.text.strip()
 
     # Strip markdown code fences if present
     if raw.startswith("```"):

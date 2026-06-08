@@ -1,10 +1,12 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-import anthropic
+import google.generativeai as genai
 import os
 
 router = APIRouter()
-client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 VALID_CATEGORIES = {"Food", "Transport", "Shopping", "Bills", "Health", "Entertainment", "Others"}
 
@@ -31,12 +33,7 @@ async def categorize(req: CategorizeRequest):
         "Reply with ONLY the category name, nothing else."
     )
 
-    message = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=16,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = message.content[0].text.strip()
+    response = model.generate_content(prompt)
+    raw = response.text.strip()
     category = raw if raw in VALID_CATEGORIES else "Others"
     return CategorizeResponse(category=category)

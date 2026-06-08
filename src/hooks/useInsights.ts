@@ -30,8 +30,10 @@ export function useInsights() {
           previousMonth: { total: previousMonthTotal },
         })
         setInsights(data)
-      } catch {
-        setError('Could not load insights. Check your connection.')
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        console.error('fetchInsights error:', msg)
+        setError(`Could not load insights: ${msg}`)
       } finally {
         setLoading(false)
       }

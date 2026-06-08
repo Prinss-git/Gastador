@@ -40,7 +40,9 @@ export default function Dashboard() {
     if (expenses.length > 0) loadInsights(selectedMonth, expenses, totalSpent, totalIncome, 0)
   }, [selectedMonth]) // eslint-disable-line
 
-  const username = user?.email?.split('@')[0] ?? 'there'
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  const initial = user?.email?.slice(0, 1).toUpperCase() ?? 'G'
 
   return (
     <div className="pb-36 min-h-screen bg-bg animate-fade-in overflow-x-hidden">
@@ -54,12 +56,14 @@ export default function Dashboard() {
         {/* Top row */}
         <div className="relative flex items-center justify-between mb-8">
           <div>
-            <p className="text-text-3 text-xs font-medium">{MONTH_NAMES[month - 1]} {year}</p>
-            <p className="text-text-1 text-base font-semibold mt-0.5">Hey, {username}</p>
+            <p className="text-text-1 text-base font-semibold">{greeting}</p>
+            <p className="text-text-3 text-xs mt-0.5">
+              {new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </p>
           </div>
           <Link to="/profile"
             className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm shadow-primary-sm">
-            {username.slice(0, 1).toUpperCase()}
+            {initial}
           </Link>
         </div>
 

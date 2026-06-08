@@ -20,50 +20,48 @@ const PlusIcon = () => (
     <path fillRule="evenodd" d="M12 3a1 1 0 011 1v7h7a1 1 0 110 2h-7v7a1 1 0 11-2 0v-7H4a1 1 0 110-2h7V4a1 1 0 011-1z" clipRule="evenodd" />
   </svg>
 )
+const UserIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+  </svg>
+)
+
+function NavItem({ to, icon, label, end }: { to: string; icon: React.ReactNode; label: string; end?: boolean }) {
+  return (
+    <NavLink to={to} end={end} className={({ isActive }) =>
+      `flex flex-col items-center gap-1 min-w-[48px] transition-all duration-200 ${isActive ? 'text-primary' : 'text-text-muted'}`
+    }>
+      {({ isActive }) => (
+        <>
+          <div className={`p-1.5 rounded-xl transition-all duration-200 ${isActive ? 'bg-primary/15 scale-110' : ''}`}>
+            {icon}
+          </div>
+          <span className={`text-[10px] font-bold transition-all ${isActive ? 'gradient-text' : ''}`}>
+            {label}
+          </span>
+        </>
+      )}
+    </NavLink>
+  )
+}
 
 export function Navbar() {
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-app z-50 pb-safe px-3">
       <div className="glass-strong rounded-2xl border border-border/60 shadow-card mb-3">
-        <div className="flex items-center justify-around px-4 py-3">
+        <div className="flex items-center justify-around px-2 py-3">
+          <NavItem to="/" icon={<HomeIcon />} label="Home" end />
+          <NavItem to="/history" icon={<ListIcon />} label="History" />
 
-          <NavLink to="/" end className={({ isActive }) =>
-            `flex flex-col items-center gap-1 min-w-[48px] transition-all duration-200 ${isActive ? 'text-primary' : 'text-text-muted'}`}>
-            {({ isActive }) => (
-              <>
-                <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-primary/15' : ''}`}><HomeIcon /></div>
-                <span className="text-[10px] font-bold">{isActive ? <span className="gradient-text">Home</span> : 'Home'}</span>
-              </>
-            )}
-          </NavLink>
-
-          <NavLink to="/history" className={({ isActive }) =>
-            `flex flex-col items-center gap-1 min-w-[48px] transition-all duration-200 ${isActive ? 'text-primary' : 'text-text-muted'}`}>
-            {({ isActive }) => (
-              <>
-                <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-primary/15' : ''}`}><ListIcon /></div>
-                <span className="text-[10px] font-bold">{isActive ? <span className="gradient-text">History</span> : 'History'}</span>
-              </>
-            )}
-          </NavLink>
-
+          {/* FAB */}
           <NavLink to="/add"
             className="-mt-7 w-14 h-14 rounded-2xl flex items-center justify-center shadow-fab transition-all duration-200 active:scale-90 hover:shadow-glow text-white"
             style={{ background: 'linear-gradient(135deg, #6C63FF 0%, #FF6B9D 100%)' }}>
             <PlusIcon />
           </NavLink>
 
-          <NavLink to="/insights" className={({ isActive }) =>
-            `flex flex-col items-center gap-1 min-w-[48px] transition-all duration-200 ${isActive ? 'text-primary' : 'text-text-muted'}`}>
-            {({ isActive }) => (
-              <>
-                <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-primary/15' : ''}`}><SparkleIcon /></div>
-                <span className="text-[10px] font-bold">{isActive ? <span className="gradient-text">Insights</span> : 'Insights'}</span>
-              </>
-            )}
-          </NavLink>
-
-          <div className="min-w-[48px]" />
+          <NavItem to="/insights" icon={<SparkleIcon />} label="Insights" />
+          <NavItem to="/profile" icon={<UserIcon />} label="Profile" />
         </div>
       </div>
     </nav>

@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import AddExpense from './pages/AddExpense'
 import History from './pages/History'
 import Insights from './pages/Insights'
+import Profile from './pages/Profile'
 import Login from './pages/Login'
 
 function AppShell({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,7 @@ function AnimatedRoutes() {
       <Route path="/add" element={<AddExpense />} />
       <Route path="/history" element={<History />} />
       <Route path="/insights" element={<Insights />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

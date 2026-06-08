@@ -5,6 +5,7 @@ import { useInsights } from '../hooks/useInsights'
 import { useExpenseStore } from '../store/expenseStore'
 import { useAuth } from '../hooks/useAuth'
 import { MonthPicker } from '../components/MonthPicker'
+import { InstallBanner } from '../components/InstallBanner'
 import { ExpenseCard } from '../components/ExpenseCard'
 import { InsightCard } from '../components/InsightCard'
 import { DonutChart, DailyBarChart } from '../components/SpendingChart'
@@ -70,10 +71,10 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold gradient-text">Gastador</h1>
             <p className="text-text-muted text-xs mt-0.5 truncate max-w-[180px]">{user?.email}</p>
           </div>
-          <button onClick={signOut}
-            className="text-text-muted text-xs px-3 py-2 rounded-xl bg-card border border-border/50 hover:text-text-primary transition-all">
-            Sign out
-          </button>
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm text-white shadow-glow-sm"
+            style={{ background: 'linear-gradient(135deg, #6C63FF, #FF6B9D)' }}>
+            {user?.email?.slice(0, 1).toUpperCase()}
+          </div>
         </div>
 
         {/* Total amount hero */}
@@ -87,6 +88,9 @@ export default function Dashboard() {
       </div>
 
       <div className="px-4 space-y-4">
+        {/* PWA Install Banner */}
+        <InstallBanner />
+
         {/* Month picker */}
         <div className="flex justify-center"><MonthPicker /></div>
 

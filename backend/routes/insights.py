@@ -2,13 +2,12 @@ import json
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Any
-import google.generativeai as genai
+from google import genai
 import os
 
 router = APIRouter()
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 
 class ExpenseItem(BaseModel):
@@ -60,10 +59,12 @@ async def insights(req: InsightsRequest):
         'Return ONLY a JSON array: [{"title": string, "body": string, "emoji": string}]'
     )
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt,
+    )
     raw = response.text.strip()
 
-    # Strip markdown code fences if present
     if raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):

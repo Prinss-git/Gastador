@@ -1,12 +1,11 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-import google.generativeai as genai
+from google import genai
 import os
 
 router = APIRouter()
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 VALID_CATEGORIES = {"Food", "Transport", "Shopping", "Bills", "Health", "Entertainment", "Others"}
 
@@ -33,7 +32,10 @@ async def categorize(req: CategorizeRequest):
         "Reply with ONLY the category name, nothing else."
     )
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt,
+    )
     raw = response.text.strip()
     category = raw if raw in VALID_CATEGORIES else "Others"
     return CategorizeResponse(category=category)

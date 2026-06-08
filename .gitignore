@@ -1,10 +1,40 @@
+# Dependencies
 node_modules
+.venv
+venv
+env
+
+# Build output
 dist
 dist-ssr
-*.local
+
+# Environment files — NEVER commit these
 .env
 .env.local
+.env.*.local
+backend/.env
+
+# Python
 __pycache__
 *.pyc
-.venv
-backend/.env
+*.pyo
+*.pyd
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vite
+*.local

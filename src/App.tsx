@@ -10,8 +10,18 @@ import Login from './pages/Login'
 
 function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-bg">
-      <div className="mx-auto max-w-app w-full min-h-screen relative overflow-x-hidden">
+    // Outer: full viewport with branded desktop background
+    <div className="min-h-screen bg-[#0A0A12] flex justify-center relative"
+      style={{
+        backgroundImage: 'radial-gradient(circle, rgba(124,111,255,0.06) 1px, transparent 1px)',
+        backgroundSize: '28px 28px',
+      }}>
+      {/* Subtle glow behind the column */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-full bg-primary/3 blur-3xl pointer-events-none" />
+
+      {/* App column */}
+      <div className="relative w-full max-w-app min-h-screen bg-bg overflow-x-hidden
+                      lg:border-x lg:border-border/60 lg:shadow-[0_0_60px_rgba(0,0,0,0.6)]">
         {children}
         <Navbar />
       </div>

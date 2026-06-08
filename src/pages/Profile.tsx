@@ -83,7 +83,7 @@ export default function Profile() {
         <div className="bg-bg-elevated rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-border/50">
             <div>
-              <p className="text-text-1 text-sm font-semibold">Monthly Budget</p>
+              <p className="text-text-1 text-sm font-semibold">Monthly Allowance</p>
               <p className="text-text-3 text-xs mt-0.5">{selectedMonth}</p>
             </div>
             <button onClick={() => setEditingBudget(!editingBudget)}
@@ -97,7 +97,7 @@ export default function Profile() {
                 <div className="flex-1 flex items-center gap-2 bg-surface rounded-xl px-3 py-2.5 border border-primary/40">
                   <span className="text-primary font-semibold text-sm">₱</span>
                   <input type="number" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)}
-                    className="flex-1 bg-transparent text-text-1 text-sm outline-none" placeholder="10000" autoFocus />
+                    className="flex-1 bg-transparent text-text-1 text-sm outline-none" placeholder="e.g. 5000" autoFocus />
                 </div>
                 <button onClick={handleSaveBudget}
                   className="bg-primary text-white rounded-xl px-4 text-sm font-semibold shadow-primary-sm">

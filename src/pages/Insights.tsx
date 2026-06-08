@@ -65,7 +65,7 @@ export default function Insights() {
         {budget.limit > 0 && (
           <div className="bg-bg-elevated rounded-2xl border border-border p-4">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-text-1 text-sm font-semibold">Budget</p>
+              <p className="text-text-1 text-sm font-semibold">Allowance</p>
               <span className={`text-xs font-semibold ${pctUsed >= 90 ? 'text-danger' : pctUsed >= 70 ? 'text-warning' : 'text-success'}`}>
                 {pctUsed.toFixed(0)}% used
               </span>
@@ -76,7 +76,7 @@ export default function Insights() {
             </div>
             <div className="flex justify-between text-xs text-text-3">
               <span>₱{total.toLocaleString('en-PH', { maximumFractionDigits: 0 })} spent</span>
-              <span>₱{budget.limit.toLocaleString()} budget</span>
+              <span>₱{budget.limit.toLocaleString()} allowance</span>
             </div>
           </div>
         )}

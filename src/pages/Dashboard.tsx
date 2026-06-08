@@ -19,8 +19,9 @@ export default function Dashboard() {
   const { insights, loading: insightsLoading, loadInsights } = useInsights()
 
   const total = expenses.reduce((s, e) => s + e.amount, 0)
-  const pct = budget.limit > 0 ? Math.min((total / budget.limit) * 100, 100) : 0
-  const remaining = budget.limit - total
+  const allowance = budget.limit
+  const remaining = allowance - total
+  const pct = allowance > 0 ? Math.min((total / allowance) * 100, 100) : 0
   const [year, month] = selectedMonth.split('-').map(Number)
 
   const categoryTotals = useMemo(() => {
@@ -60,25 +61,38 @@ export default function Dashboard() {
 
         {/* Balance */}
         <div className="relative mb-6">
-          <p className="text-text-3 text-xs font-medium mb-2">Total Spent</p>
-          <p className="text-text-1 font-bold tracking-tight" style={{ fontSize: 'clamp(2rem, 10vw, 3rem)' }}>
-            ₱{total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
+          {allowance > 0 ? (
+            <>
+              <p className="text-text-3 text-xs font-medium mb-2">
+                {remaining >= 0 ? 'Remaining' : 'Over budget'}
+              </p>
+              <p className={`font-bold tracking-tight ${remaining < 0 ? 'text-danger' : 'text-text-1'}`}
+                style={{ fontSize: 'clamp(2rem, 10vw, 3rem)' }}>
+                {remaining < 0 ? '-' : ''}₱{Math.abs(remaining).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <p className="text-text-3 text-xs mt-1.5">
+                ₱{total.toLocaleString('en-PH', { maximumFractionDigits: 0 })} spent of ₱{allowance.toLocaleString()} allowance
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-text-3 text-xs font-medium mb-2">Total Spent</p>
+              <p className="text-text-1 font-bold tracking-tight" style={{ fontSize: 'clamp(2rem, 10vw, 3rem)' }}>
+                ₱{total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <p className="text-text-3 text-xs mt-1.5">Set your allowance in Profile to track your balance</p>
+            </>
+          )}
         </div>
 
-        {/* Budget progress */}
-        {budget.limit > 0 && (
+        {/* Allowance progress bar */}
+        {allowance > 0 && (
           <div className="relative">
-            <div className="flex justify-between text-xs mb-2">
-              <span className="text-text-3">{pct.toFixed(0)}% of ₱{budget.limit.toLocaleString()} budget</span>
-              <span className={remaining >= 0 ? 'text-success font-medium' : 'text-danger font-medium'}>
-                {remaining >= 0 ? `₱${remaining.toLocaleString('en-PH', { maximumFractionDigits: 0 })} left` : 'Over budget'}
-              </span>
-            </div>
-            <div className="h-1 rounded-full bg-border overflow-hidden">
+            <div className="h-1.5 rounded-full bg-border overflow-hidden">
               <div className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${pct}%`, backgroundColor: pct >= 90 ? '#F87171' : pct >= 70 ? '#FBBF24' : '#7C6FFF' }} />
+                style={{ width: `${pct}%`, backgroundColor: pct >= 100 ? '#F87171' : pct >= 80 ? '#FBBF24' : '#7C6FFF' }} />
             </div>
+            <p className="text-text-3 text-xs mt-1.5 text-right">{pct.toFixed(0)}% used</p>
           </div>
         )}
       </div>

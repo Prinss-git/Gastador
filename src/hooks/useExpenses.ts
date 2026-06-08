@@ -92,9 +92,11 @@ export function useExpenses() {
           { merge: true }
         )
         setBudget({ ...budget, spent: newSpent })
-      } catch {
-        toast.error('Failed to save expense')
-        throw new Error('save failed')
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        console.error('saveExpense error:', msg)
+        toast.error(`Save failed: ${msg}`)
+        throw err
       }
     },
     [user, budget, selectedMonth, addExpense, setBudget]

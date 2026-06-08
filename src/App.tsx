@@ -17,7 +17,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
         backgroundSize: '28px 28px',
       }}>
       {/* Subtle glow behind the column */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-full bg-primary/3 blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-full bg-primary/5 blur-3xl pointer-events-none" />
 
       {/* App column */}
       <div className="relative w-full max-w-app min-h-screen bg-bg overflow-x-hidden

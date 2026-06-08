@@ -1,9 +1,6 @@
 import { useExpenseStore } from '../store/expenseStore'
 
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-]
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 export function MonthPicker() {
   const { selectedMonth, setSelectedMonth } = useExpenseStore()
@@ -16,31 +13,23 @@ export function MonthPicker() {
 
   const next = () => {
     const d = new Date(year, month, 1)
-    const now = new Date()
-    if (d > now) return
+    if (d > new Date()) return
     setSelectedMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`)
   }
 
-  const isCurrentMonth =
-    new Date(year, month - 1, 1).getMonth() === new Date().getMonth() &&
-    year === new Date().getFullYear()
+  const isCurrentMonth = year === new Date().getFullYear() && month === new Date().getMonth() + 1
 
   return (
-    <div className="flex items-center gap-3">
-      <button
-        onClick={prev}
-        className="w-8 h-8 flex items-center justify-center rounded-full bg-card text-white hover:bg-primary/20 transition-colors"
-      >
+    <div className="flex items-center gap-1.5">
+      <button onClick={prev}
+        className="w-7 h-7 flex items-center justify-center rounded-lg bg-surface text-text-2 hover:text-text-1 hover:bg-surface-hover transition-colors text-lg leading-none">
         ‹
       </button>
-      <span className="text-white font-medium text-sm min-w-[110px] text-center">
+      <span className="text-text-2 font-semibold text-xs min-w-[72px] text-center">
         {MONTHS[month - 1]} {year}
       </span>
-      <button
-        onClick={next}
-        disabled={isCurrentMonth}
-        className="w-8 h-8 flex items-center justify-center rounded-full bg-card text-white hover:bg-primary/20 transition-colors disabled:opacity-30"
-      >
+      <button onClick={next} disabled={isCurrentMonth}
+        className="w-7 h-7 flex items-center justify-center rounded-lg bg-surface text-text-2 hover:text-text-1 hover:bg-surface-hover transition-colors text-lg leading-none disabled:opacity-30">
         ›
       </button>
     </div>

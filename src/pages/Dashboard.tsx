@@ -1,132 +1,99 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useExpenses } from '../hooks/useExpenses'
 import { useInsights } from '../hooks/useInsights'
 import { useExpenseStore } from '../store/expenseStore'
 import { useAuth } from '../hooks/useAuth'
 import { MonthPicker } from '../components/MonthPicker'
-import { InstallBanner } from '../components/InstallBanner'
 import { ExpenseCard } from '../components/ExpenseCard'
 import { InsightCard } from '../components/InsightCard'
 import { DonutChart, DailyBarChart } from '../components/SpendingChart'
 import { SkeletonCard } from '../components/SkeletonLoader'
+import { InstallBanner } from '../components/InstallBanner'
 
-function BudgetBar({ spent, limit }: { spent: number; limit: number }) {
-  const pct = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0
-  const color = pct >= 90 ? '#EF4444' : pct >= 70 ? '#F59E0B' : '#10B981'
-  return (
-    <div>
-      <div className="flex justify-between text-xs mb-2">
-        <span className="text-text-muted font-medium">Budget used</span>
-        <span className="font-bold" style={{ color }}>{pct.toFixed(0)}%</span>
-      </div>
-      <div className="h-2.5 rounded-full bg-white/5 overflow-hidden border border-white/5">
-        <div className="h-full rounded-full transition-all duration-700"
-          style={{ width: `${pct}%`, backgroundColor: color, boxShadow: `0 0 8px ${color}60` }} />
-      </div>
-      <div className="flex justify-between text-xs mt-1.5">
-        <span className="text-text-muted">₱{spent.toFixed(2)} spent</span>
-        <span className="text-text-muted">₱{limit.toFixed(2)} limit</span>
-      </div>
-    </div>
-  )
-}
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 export default function Dashboard() {
-  const { user, signOut } = useAuth()
-  const { expenses, budget, deleteExpense, updateBudgetLimit } = useExpenses()
+  const { user } = useAuth()
+  const { expenses, budget, deleteExpense } = useExpenses()
   const { selectedMonth } = useExpenseStore()
   const { insights, loading: insightsLoading, error: insightsError, loadInsights } = useInsights()
-  const [editingBudget, setEditingBudget] = useState(false)
-  const [budgetInput, setBudgetInput] = useState('')
 
   const total = expenses.reduce((s, e) => s + e.amount, 0)
+  const pct = budget.limit > 0 ? Math.min((total / budget.limit) * 100, 100) : 0
+  const budgetColor = pct >= 90 ? '#F87171' : pct >= 70 ? '#FBBF24' : '#4ADE80'
   const recent = expenses.slice(0, 3)
+  const [year, month] = selectedMonth.split('-').map(Number)
 
   useEffect(() => {
-    if (expenses.length > 0) {
+    if (expenses.length > 0)
       loadInsights(selectedMonth, expenses, total, budget.limit, 0)
-    }
   }, [selectedMonth]) // eslint-disable-line
 
-  const saveBudget = async () => {
-    const val = parseFloat(budgetInput)
-    if (val > 0) await updateBudgetLimit(val)
-    setEditingBudget(false)
-  }
-
-  const [year, month] = selectedMonth.split('-').map(Number)
-  const monthName = new Date(year, month - 1).toLocaleDateString('en-PH', { month: 'long', year: 'numeric' })
-
   return (
-    <div className="pb-32 animate-fade-in">
-      {/* Header with gradient */}
-      <div className="relative overflow-hidden px-4 pt-12 pb-6"
-        style={{ background: 'linear-gradient(180deg, rgba(108,99,255,0.12) 0%, transparent 100%)' }}>
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at top, rgba(108,99,255,0.1) 0%, transparent 70%)' }} />
-        <div className="flex items-start justify-between relative z-10">
+    <div className="pb-32 animate-fade-in bg-bg min-h-screen">
+
+      {/* ── Hero header ── */}
+      <div className="px-5 pt-14 pb-6">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <p className="text-text-muted text-sm mb-1">Good day 👋</p>
-            <h1 className="text-2xl font-bold gradient-text">Gastador</h1>
-            <p className="text-text-muted text-xs mt-0.5 truncate max-w-[180px]">{user?.email}</p>
+            <p className="text-text-3 text-xs font-semibold uppercase tracking-widest">
+              {MONTHS[month - 1]} {year}
+            </p>
+            <h1 className="text-text-1 text-xl font-bold mt-0.5">
+              Hey, {user?.email?.split('@')[0]} 👋
+            </h1>
           </div>
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm text-white shadow-glow-sm"
-            style={{ background: 'linear-gradient(135deg, #6C63FF, #FF6B9D)' }}>
+          <Link to="/profile"
+            className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white font-bold text-sm shadow-primary-sm">
             {user?.email?.slice(0, 1).toUpperCase()}
-          </div>
+          </Link>
         </div>
 
-        {/* Total amount hero */}
-        <div className="mt-6">
-          <p className="text-text-muted text-xs font-semibold uppercase tracking-widest mb-1">{monthName}</p>
-          <p className="text-5xl font-bold text-text-primary tracking-tight">
-            ₱<span className="gradient-text">{total.toFixed(2)}</span>
+        {/* Total spend card */}
+        <div className="bg-primary rounded-3xl p-5 shadow-primary relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-white/5 -translate-y-10 translate-x-10" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-black/10 translate-y-8 -translate-x-6" />
+          <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-2">Total Spent</p>
+          <p className="text-white text-4xl font-bold tracking-tight">
+            ₱{total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
-          <p className="text-text-muted text-sm mt-1">{expenses.length} transaction{expenses.length !== 1 ? 's' : ''}</p>
+          <div className="mt-4 space-y-1.5">
+            <div className="flex justify-between text-xs">
+              <span className="text-white/50">Budget</span>
+              <span className="text-white/80 font-semibold">
+                ₱{budget.limit.toLocaleString()} · {pct.toFixed(0)}% used
+              </span>
+            </div>
+            <div className="h-1.5 rounded-full bg-white/20 overflow-hidden">
+              <div className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${pct}%`, backgroundColor: budgetColor }} />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="px-4 space-y-4">
-        {/* PWA Install Banner */}
-        <InstallBanner />
-
+      <div className="px-5 space-y-5">
         {/* Month picker */}
-        <div className="flex justify-center"><MonthPicker /></div>
-
-        {/* Budget card */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50 shadow-card">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-text-primary font-bold text-sm">Monthly Budget</p>
-            <button onClick={() => { setEditingBudget(!editingBudget); setBudgetInput(String(budget.limit)) }}
-              className="text-primary text-xs font-semibold px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 transition-all">
-              {editingBudget ? 'Cancel' : 'Edit'}
-            </button>
-          </div>
-          {editingBudget ? (
-            <div className="flex gap-2">
-              <input type="number" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)}
-                className="flex-1 bg-background text-text-primary rounded-xl px-3 py-2.5 text-sm outline-none border border-primary"
-                placeholder="Enter budget limit" />
-              <button onClick={saveBudget}
-                className="text-white rounded-xl px-4 py-2 text-sm font-bold shadow-glow-sm"
-                style={{ background: 'linear-gradient(135deg, #6C63FF, #8B85FF)' }}>
-                Save
-              </button>
-            </div>
-          ) : (
-            <BudgetBar spent={total} limit={budget.limit} />
-          )}
+        <div className="flex justify-between items-center">
+          <MonthPicker />
+          <Link to="/add"
+            className="text-xs font-semibold text-primary bg-primary-bg px-3 py-1.5 rounded-xl">
+            + Add Expense
+          </Link>
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 gap-4">
-          <div className="bg-card rounded-2xl p-4 border border-border/50 shadow-card">
-            <p className="text-text-primary font-bold text-sm mb-3">Spending by Category</p>
+        {/* Install banner */}
+        <InstallBanner />
+
+        {/* Charts row */}
+        <div className="space-y-3">
+          <div className="card p-4">
+            <p className="text-text-2 text-xs font-bold uppercase tracking-widest mb-3">By Category</p>
             <DonutChart expenses={expenses} />
           </div>
-          <div className="bg-card rounded-2xl p-4 border border-border/50 shadow-card">
-            <p className="text-text-primary font-bold text-sm mb-3">Daily Spending</p>
+          <div className="card p-4">
+            <p className="text-text-2 text-xs font-bold uppercase tracking-widest mb-3">Daily Spending</p>
             <DailyBarChart expenses={expenses} month={selectedMonth} />
           </div>
         </div>
@@ -134,16 +101,14 @@ export default function Dashboard() {
         {/* Recent expenses */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-text-primary font-bold text-sm">Recent Expenses</p>
-            <Link to="/history" className="text-primary text-xs font-semibold px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 transition-all">
-              See all →
-            </Link>
+            <p className="text-text-1 font-bold text-sm">Recent</p>
+            <Link to="/history" className="text-primary text-xs font-semibold">See all →</Link>
           </div>
           {recent.length === 0 ? (
-            <div className="bg-card rounded-2xl p-8 text-center border border-border/50">
-              <p className="text-4xl mb-3 animate-float">📭</p>
-              <p className="text-text-primary font-semibold">No expenses yet</p>
-              <p className="text-text-muted text-sm mt-1">Tap + to add your first expense</p>
+            <div className="card p-8 flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-2xl bg-surface flex items-center justify-center text-2xl mb-3 animate-float">📭</div>
+              <p className="text-text-1 font-semibold text-sm">No expenses yet</p>
+              <p className="text-text-3 text-xs mt-1">Tap + to add your first one</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -155,22 +120,20 @@ export default function Dashboard() {
         {/* AI Insights */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <p className="text-text-primary font-bold text-sm">✨ AI Insights</p>
-            {insightsLoading && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />}
+            <p className="text-text-1 font-bold text-sm">AI Insights</p>
+            <span className="pill bg-primary-bg text-primary text-[10px]">✨ Powered by Groq</span>
           </div>
           {insightsLoading ? (
             <div className="space-y-2"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>
           ) : insightsError ? (
-            <div className="bg-card rounded-2xl p-5 text-center border border-border/50">
-              <p className="text-text-muted text-sm mb-2">{insightsError}</p>
+            <div className="card p-5 text-center">
+              <p className="text-text-3 text-sm">{insightsError}</p>
               <button onClick={() => loadInsights(selectedMonth, expenses, total, budget.limit, 0)}
-                className="text-primary text-sm font-semibold">Retry</button>
+                className="text-primary text-sm font-semibold mt-2">Retry</button>
             </div>
-          ) : insights.length === 0 && expenses.length > 0 ? (
-            <div className="space-y-2"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>
           ) : insights.length === 0 ? (
-            <div className="bg-card rounded-2xl p-5 text-center border border-border/50">
-              <p className="text-text-muted text-sm">Add expenses to get AI-powered insights</p>
+            <div className="card p-5 text-center">
+              <p className="text-text-3 text-sm">Add expenses to get AI-powered insights</p>
             </div>
           ) : (
             <div className="space-y-2">

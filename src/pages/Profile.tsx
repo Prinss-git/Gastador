@@ -40,64 +40,57 @@ export default function Profile() {
   }
 
   return (
-    <div className="pb-32 animate-fade-in">
+    <div className="pb-32 animate-fade-in bg-bg min-h-screen overflow-x-hidden">
       {/* Header */}
-      <div className="relative overflow-hidden px-4 pt-12 pb-8"
-        style={{ background: 'linear-gradient(180deg, rgba(108,99,255,0.15) 0%, transparent 100%)' }}>
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at top right, rgba(255,107,157,0.1) 0%, transparent 60%)' }} />
-        <h1 className="text-xl font-bold text-text-primary mb-6">Profile</h1>
+      <div className="px-5 pt-14 pb-8">
+        <h1 className="text-text-1 text-xl font-bold mb-8">Profile</h1>
 
         {/* Avatar */}
         <div className="flex flex-col items-center">
-          <div className="w-24 h-24 rounded-3xl flex items-center justify-center text-3xl font-bold text-white mb-4 shadow-glow animate-float"
-            style={{ background: 'linear-gradient(135deg, #6C63FF 0%, #FF6B9D 100%)' }}>
+          <div className="w-24 h-24 rounded-3xl flex items-center justify-center text-3xl font-bold text-white mb-4 bg-primary shadow-primary animate-float">
             {initials}
           </div>
-          <p className="text-text-primary font-bold text-lg">{email}</p>
-          <p className="text-text-muted text-sm mt-1">Member since {memberSince}</p>
+          <p className="text-text-1 font-bold text-base">{email}</p>
+          <p className="text-text-3 text-xs mt-1">Member since {memberSince}</p>
         </div>
       </div>
 
-      <div className="px-4 space-y-4">
+      <div className="px-5 space-y-3">
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Expenses', value: expenses.length, suffix: '' },
-            { label: 'Spent', value: `₱${totalSpent.toFixed(0)}`, suffix: '' },
-            { label: 'Top Category', value: topCategory, suffix: '' },
+            { label: 'Expenses', value: String(expenses.length) },
+            { label: 'Spent', value: `₱${totalSpent.toFixed(0)}` },
+            { label: 'Top Cat.', value: topCategory },
           ].map((stat) => (
-            <div key={stat.label} className="bg-card rounded-2xl p-3 border border-border/50 text-center">
-              <p className="text-text-primary font-bold text-base truncate">{stat.value}</p>
-              <p className="text-text-muted text-xs mt-0.5">{stat.label}</p>
+            <div key={stat.label} className="card p-3 text-center">
+              <p className="text-text-1 font-bold text-base truncate">{stat.value}</p>
+              <p className="text-text-3 text-xs mt-0.5">{stat.label}</p>
             </div>
           ))}
         </div>
 
         {/* Budget settings */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
+        <div className="card p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-text-primary font-bold text-sm">Monthly Budget</p>
-              <p className="text-text-muted text-xs mt-0.5">{selectedMonth}</p>
+              <p className="text-text-1 font-bold text-sm">Monthly Budget</p>
+              <p className="text-text-3 text-xs mt-0.5">{selectedMonth}</p>
             </div>
             <button onClick={() => setEditingBudget(!editingBudget)}
-              className="text-xs font-bold px-3 py-1.5 rounded-xl bg-primary/15 text-primary">
+              className="text-xs font-bold px-3 py-1.5 rounded-xl bg-primary-bg text-primary">
               {editingBudget ? 'Cancel' : 'Edit'}
             </button>
           </div>
           {editingBudget ? (
             <div className="flex gap-2">
-              <div className="flex-1 flex items-center gap-2 bg-background rounded-xl px-3 py-2.5 border border-primary">
+              <div className="flex-1 flex items-center gap-2 bg-surface rounded-xl px-3 py-2.5 border border-primary/50">
                 <span className="text-primary font-bold">₱</span>
-                <input type="number" value={budgetInput}
-                  onChange={(e) => setBudgetInput(e.target.value)}
-                  className="flex-1 bg-transparent text-text-primary text-sm outline-none"
-                  placeholder="10000" />
+                <input type="number" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)}
+                  className="flex-1 bg-transparent text-text-1 text-sm outline-none" placeholder="10000" />
               </div>
               <button onClick={handleSaveBudget}
-                className="text-white rounded-xl px-4 py-2 text-sm font-bold shadow-glow-sm"
-                style={{ background: 'linear-gradient(135deg, #6C63FF, #8B85FF)' }}>
+                className="bg-primary text-white rounded-xl px-4 py-2 text-sm font-bold shadow-primary-sm">
                 Save
               </button>
             </div>
@@ -107,9 +100,9 @@ export default function Profile() {
         </div>
 
         {/* Account info */}
-        <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-border/50">
-            <p className="text-text-muted text-xs font-bold uppercase tracking-widest">Account</p>
+        <div className="card overflow-hidden">
+          <div className="px-4 py-3 border-b border-border">
+            <p className="section-label">Account</p>
           </div>
           {[
             { icon: '📧', label: 'Email', value: email },
@@ -118,20 +111,20 @@ export default function Profile() {
             { icon: '🆔', label: 'User ID', value: (user?.uid?.slice(0, 12) ?? '—') + '…' },
           ].map((item, i, arr) => (
             <div key={item.label}
-              className={`flex items-center gap-3 px-4 py-3.5 ${i < arr.length - 1 ? 'border-b border-border/30' : ''}`}>
+              className={`flex items-center gap-3 px-4 py-3.5 ${i < arr.length - 1 ? 'border-b border-border/40' : ''}`}>
               <span className="text-lg w-7">{item.icon}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-text-muted text-xs">{item.label}</p>
-                <p className="text-text-primary text-sm font-medium truncate mt-0.5">{item.value}</p>
+                <p className="text-text-3 text-xs">{item.label}</p>
+                <p className="text-text-1 text-sm font-medium truncate mt-0.5">{item.value}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* App info */}
-        <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-border/50">
-            <p className="text-text-muted text-xs font-bold uppercase tracking-widest">App</p>
+        <div className="card overflow-hidden">
+          <div className="px-4 py-3 border-b border-border">
+            <p className="section-label">App</p>
           </div>
           {[
             { icon: '💸', label: 'App Name', value: 'Gastador' },
@@ -140,11 +133,11 @@ export default function Profile() {
             { icon: '☁️', label: 'Database', value: 'Firebase Firestore' },
           ].map((item, i, arr) => (
             <div key={item.label}
-              className={`flex items-center gap-3 px-4 py-3.5 ${i < arr.length - 1 ? 'border-b border-border/30' : ''}`}>
+              className={`flex items-center gap-3 px-4 py-3.5 ${i < arr.length - 1 ? 'border-b border-border/40' : ''}`}>
               <span className="text-lg w-7">{item.icon}</span>
               <div className="flex-1">
-                <p className="text-text-muted text-xs">{item.label}</p>
-                <p className="text-text-primary text-sm font-medium mt-0.5">{item.value}</p>
+                <p className="text-text-3 text-xs">{item.label}</p>
+                <p className="text-text-1 text-sm font-medium mt-0.5">{item.value}</p>
               </div>
             </div>
           ))}
@@ -152,13 +145,11 @@ export default function Profile() {
 
         {/* Sign out */}
         <button onClick={handleSignOut} disabled={signingOut}
-          className="w-full py-4 rounded-2xl font-bold text-danger text-sm border border-danger/30 bg-danger/5 hover:bg-danger/10 transition-all active:scale-95 disabled:opacity-50">
+          className="w-full py-4 rounded-2xl font-bold text-danger text-sm border border-danger/30 bg-danger/5 hover:bg-danger/10 transition-all active:scale-[0.98] disabled:opacity-50">
           {signingOut ? 'Signing out…' : '🚪 Sign Out'}
         </button>
 
-        <p className="text-center text-text-muted text-xs pb-2">
-          Made with 💜 · Gastador v{VERSION}
-        </p>
+        <p className="text-center text-text-3 text-xs pb-2">Made with 💜 · Gastador v{VERSION}</p>
       </div>
     </div>
   )

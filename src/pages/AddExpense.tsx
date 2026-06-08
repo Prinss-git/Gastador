@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { useExpenses } from '../hooks/useExpenses'
 import { categorizeExpense } from '../services/ai'
 import { CategoryBadge } from '../components/CategoryBadge'
-import { CATEGORIES, type Category } from '../constants/categories'
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_EMOJIS, type Category } from '../constants/categories'
 
 export default function AddExpense() {
   const navigate = useNavigate()
@@ -29,7 +29,6 @@ export default function AddExpense() {
         const cat = await categorizeExpense(description, parseFloat(amount) || 0)
         setCategory(cat)
       } catch {
-        // fallback: keyword categorizer already tried inside categorizeExpense
         setCategory('Others')
       } finally {
         setCategoryLoading(false)
@@ -49,7 +48,7 @@ export default function AddExpense() {
         amount: parseFloat(parseFloat(amount).toFixed(2)),
         category: finalCategory,
         date: new Date(date + 'T12:00:00'),
-        notes: notes.trim() || undefined,
+        notes: notes.trim() || '',
         aiCategorized: true,
       })
       setSaved(true)
@@ -61,77 +60,69 @@ export default function AddExpense() {
   }
 
   return (
-    <div className="pb-32 animate-fade-in overflow-x-hidden">
+    <div className="pb-32 min-h-screen bg-bg animate-fade-in overflow-x-hidden">
       {/* Header */}
-      <div className="relative overflow-hidden px-4 pt-12 pb-6"
-        style={{ background: 'linear-gradient(180deg, rgba(108,99,255,0.1) 0%, transparent 100%)' }}>
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)}
-            className="w-9 h-9 rounded-xl bg-card border border-border/50 flex items-center justify-center text-text-muted hover:text-text-primary transition-all">
-            ←
-          </button>
-          <h1 className="text-xl font-bold text-text-primary">Add Expense</h1>
-        </div>
+      <div className="flex items-center gap-3 px-5 pt-14 pb-6">
+        <button onClick={() => navigate(-1)}
+          className="w-9 h-9 rounded-xl bg-bg-elevated border border-border flex items-center justify-center text-text-2 hover:text-text-1 transition-colors">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-4 h-4">
+            <path d="M19 12H5M12 5l-7 7 7 7" />
+          </svg>
+        </button>
+        <h1 className="text-text-1 text-xl font-bold">Add Expense</h1>
       </div>
 
-      <div className="px-4 space-y-3">
-        {/* Description */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
-          <label className="block text-text-muted text-xs font-bold mb-2 uppercase tracking-widest">Description</label>
-          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)}
-            placeholder="e.g. Jollibee lunch, Grab to work…"
-            className="w-full bg-transparent text-text-primary text-base outline-none placeholder:text-text-muted"
-            autoFocus />
-        </div>
-
-        {/* Amount */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
-          <label className="block text-text-muted text-xs font-bold mb-2 uppercase tracking-widest">Amount</label>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold gradient-text">₱</span>
+      <div className="px-5 space-y-3">
+        {/* Amount — hero input */}
+        <div className="card p-5">
+          <p className="section-label mb-3">Amount</p>
+          <div className="flex items-center gap-3">
+            <span className="text-primary text-3xl font-bold">₱</span>
             <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)}
-              placeholder="0.00" min="0" step="0.01"
-              className="flex-1 bg-transparent text-text-primary text-3xl font-bold outline-none placeholder:text-text-muted/30" />
+              placeholder="0.00" min="0" step="0.01" autoFocus
+              className="flex-1 bg-transparent text-text-1 text-4xl font-bold outline-none placeholder:text-text-3/40 tracking-tight" />
           </div>
         </div>
 
+        {/* Description */}
+        <div className="card p-4">
+          <p className="section-label mb-2">Description</p>
+          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)}
+            placeholder="What did you spend on?"
+            className="w-full bg-transparent text-text-1 text-base outline-none placeholder:text-text-3" />
+        </div>
+
         {/* Category */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
+        <div className="card p-4">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-text-muted text-xs font-bold uppercase tracking-widest">Category</label>
+            <p className="section-label">Category</p>
             {category && !showPicker && (
-              <button onClick={() => setShowPicker(true)}
-                className="text-primary text-xs font-semibold px-2 py-1 rounded-lg bg-primary/10">
-                Change
-              </button>
+              <button onClick={() => setShowPicker(true)} className="text-primary text-xs font-semibold">Change</button>
             )}
           </div>
 
           {categoryLoading ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="text-text-muted text-sm">AI categorizing…</span>
+            <div className="flex items-center gap-2 text-text-3 text-sm">
+              <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              AI categorizing…
             </div>
-          ) : !category || showPicker ? (
-            <div>
-              {!category && !showPicker && (
-                <button onClick={() => setShowPicker(true)} className="text-primary text-sm font-semibold">
-                  + Select category
-                </button>
-              )}
-              {showPicker && (
-                <div className="grid grid-cols-3 gap-2">
-                  {CATEGORIES.map((cat) => (
-                    <button key={cat} onClick={() => { setCategory(cat); setShowPicker(false) }}
-                      className={`rounded-xl py-2 px-2 text-xs font-medium transition-all ${
-                        category === cat ? 'ring-2 ring-primary scale-95' : 'hover:scale-95'
-                      }`}
-                      style={{ backgroundColor: category === cat ? 'rgba(108,99,255,0.2)' : 'rgba(255,255,255,0.03)' }}>
-                      <CategoryBadge category={cat} size="sm" />
-                    </button>
-                  ))}
-                </div>
-              )}
+          ) : showPicker || !category ? (
+            <div className="grid grid-cols-4 gap-2">
+              {CATEGORIES.map((cat) => {
+                const color = CATEGORY_COLORS[cat]
+                const emoji = CATEGORY_EMOJIS[cat]
+                const selected = category === cat
+                return (
+                  <button key={cat} onClick={() => { setCategory(cat); setShowPicker(false) }}
+                    className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all duration-150 ${
+                      selected ? 'border-primary' : 'border-border hover:border-border-light'
+                    }`}
+                    style={{ backgroundColor: selected ? `${color}18` : 'rgba(255,255,255,0.02)' }}>
+                    <span className="text-xl">{emoji}</span>
+                    <span className="text-[10px] font-semibold text-text-2 text-center leading-tight">{cat}</span>
+                  </button>
+                )
+              })}
             </div>
           ) : (
             <button onClick={() => setShowPicker(true)} className="animate-scale-in">
@@ -140,34 +131,32 @@ export default function AddExpense() {
           )}
         </div>
 
-        {/* Date */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
-          <label className="block text-text-muted text-xs font-bold mb-2 uppercase tracking-widest">Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-            max={new Date().toISOString().slice(0, 10)}
-            className="w-full bg-transparent text-text-primary outline-none text-sm" />
+        {/* Date & Notes row */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="card p-4">
+            <p className="section-label mb-2">Date</p>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+              max={new Date().toISOString().slice(0, 10)}
+              className="w-full bg-transparent text-text-1 text-sm outline-none" />
+          </div>
+          <div className="card p-4">
+            <p className="section-label mb-2">Notes</p>
+            <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)}
+              placeholder="Optional…"
+              className="w-full bg-transparent text-text-1 text-sm outline-none placeholder:text-text-3" />
+          </div>
         </div>
 
-        {/* Notes */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
-          <label className="block text-text-muted text-xs font-bold mb-2 uppercase tracking-widest">Notes (optional)</label>
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
-            placeholder="Any details…" rows={2}
-            className="w-full bg-transparent text-text-primary text-sm outline-none resize-none placeholder:text-text-muted" />
-        </div>
-
-        {/* Save button */}
-        <button onClick={handleSave} disabled={saving}
-          className={`w-full py-4 rounded-2xl font-bold text-white text-base transition-all active:scale-95 ${
-            saved ? 'bg-success' : saving ? 'opacity-60' : 'shadow-glow'
-          }`}
-          style={!saved ? { background: 'linear-gradient(135deg, #6C63FF 0%, #FF6B9D 100%)' } : {}}>
-          {saved ? '✓ Saved!' : saving ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Saving…
-            </span>
-          ) : 'Save Expense'}
+        {/* Save */}
+        <button onClick={handleSave} disabled={saving || saved}
+          className={`w-full py-4 rounded-2xl font-bold text-white text-sm transition-all duration-200 active:scale-[0.98] ${
+            saved ? 'bg-success' : 'bg-primary shadow-primary hover:bg-primary-soft disabled:opacity-50'
+          }`}>
+          {saved ? '✓ Saved!' : saving
+            ? <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Saving…
+              </span>
+            : 'Save Expense'}
         </button>
       </div>
     </div>

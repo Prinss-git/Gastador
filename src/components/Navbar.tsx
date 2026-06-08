@@ -1,42 +1,49 @@
 import { NavLink } from 'react-router-dom'
 
-const HomeIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-  </svg>
-)
-const ListIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-  </svg>
-)
-const SparkleIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" />
-  </svg>
-)
-const PlusIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-    <path fillRule="evenodd" d="M12 3a1 1 0 011 1v7h7a1 1 0 110 2h-7v7a1 1 0 11-2 0v-7H4a1 1 0 110-2h7V4a1 1 0 011-1z" clipRule="evenodd" />
-  </svg>
-)
-const UserIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-  </svg>
-)
+const icons = {
+  home: (
+    <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  history: (
+    <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+    </svg>
+  ),
+  plus: (
+    <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  ),
+  insights: (
+    <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  ),
+  profile: (
+    <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+}
 
-function NavItem({ to, icon, label, end }: { to: string; icon: React.ReactNode; label: string; end?: boolean }) {
+function Tab({ to, icon, label, end }: { to: string; icon: React.ReactNode; label: string; end?: boolean }) {
   return (
     <NavLink to={to} end={end} className={({ isActive }) =>
-      `flex flex-col items-center gap-1 min-w-[48px] transition-all duration-200 ${isActive ? 'text-primary' : 'text-text-muted'}`
+      `relative flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all duration-200 min-w-[52px] ${
+        isActive ? 'text-primary' : 'text-text-3 hover:text-text-2'
+      }`
     }>
       {({ isActive }) => (
         <>
-          <div className={`p-1.5 rounded-xl transition-all duration-200 ${isActive ? 'bg-primary/15 scale-110' : ''}`}>
+          {isActive && (
+            <span className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+          )}
+          <span className={`transition-transform duration-200 ${isActive ? 'scale-110' : ''}`}>
             {icon}
-          </div>
-          <span className={`text-[10px] font-bold transition-all ${isActive ? 'gradient-text' : ''}`}>
+          </span>
+          <span className={`text-[9px] font-bold tracking-wide ${isActive ? 'text-primary' : ''}`}>
             {label}
           </span>
         </>
@@ -47,21 +54,20 @@ function NavItem({ to, icon, label, end }: { to: string; icon: React.ReactNode; 
 
 export function Navbar() {
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-app z-50 pb-safe px-3">
-      <div className="glass-strong rounded-2xl border border-border/60 shadow-card mb-3">
-        <div className="flex items-center justify-around px-2 py-3">
-          <NavItem to="/" icon={<HomeIcon />} label="Home" end />
-          <NavItem to="/history" icon={<ListIcon />} label="History" />
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-app z-50 pb-safe px-4">
+      <div className="glass rounded-2xl border border-border shadow-medium mb-3">
+        <div className="flex items-center justify-around px-2 py-2.5">
+          <Tab to="/" icon={icons.home} label="Home" end />
+          <Tab to="/history" icon={icons.history} label="History" />
 
           {/* FAB */}
           <NavLink to="/add"
-            className="-mt-7 w-14 h-14 rounded-2xl flex items-center justify-center shadow-fab transition-all duration-200 active:scale-90 hover:shadow-glow text-white"
-            style={{ background: 'linear-gradient(135deg, #6C63FF 0%, #FF6B9D 100%)' }}>
-            <PlusIcon />
+            className="-mt-6 w-13 h-13 w-[52px] h-[52px] rounded-2xl bg-primary flex items-center justify-center text-white shadow-primary transition-all duration-200 active:scale-90 hover:bg-primary-soft">
+            {icons.plus}
           </NavLink>
 
-          <NavItem to="/insights" icon={<SparkleIcon />} label="Insights" />
-          <NavItem to="/profile" icon={<UserIcon />} label="Profile" />
+          <Tab to="/insights" icon={icons.insights} label="Insights" />
+          <Tab to="/profile" icon={icons.profile} label="Profile" />
         </div>
       </div>
     </nav>

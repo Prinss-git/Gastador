@@ -9,8 +9,10 @@ import {
 import { auth } from '../services/firebase'
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  // auth.currentUser is set synchronously from the persisted session cache
+  // so we only show a loading screen when it's genuinely unknown
+  const [user, setUser] = useState<User | null>(auth.currentUser)
+  const [loading, setLoading] = useState(auth.currentUser === null)
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {

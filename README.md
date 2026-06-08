@@ -2,19 +2,21 @@
 
 An AI-powered expense tracker PWA built for Filipinos. Track your spending, get AI-generated insights, and install it on your phone like a native app.
 
-**Live app:** https://gastador-git-main-prins-projects1.vercel.app
+**Live app:** https://gastador.vercel.app
 
 ---
 
 ## Features
 
-- **AI Categorization** — type an expense description and Gemini auto-detects the category (Jollibee → Food, Grab → Transport, Meralco → Bills, etc.)
-- **AI Insights** — monthly spending analysis with practical money-saving tips
+- **AI Categorization** — type an expense and Llama 3 auto-detects the category (Jollibee → Food, Grab → Transport, Meralco → Bills, etc.)
+- **AI Insights** — monthly spending analysis with practical money-saving tips powered by Groq
 - **Charts** — donut chart by category + daily bar chart
-- **Budget tracker** — progress bar with green/amber/red indicators
+- **Budget tracker** — set a monthly budget with a color-coded progress bar
 - **Transaction history** — search, filter by category, grouped by date, swipe to delete
+- **Profile page** — spending stats, budget editor, account info
 - **PWA** — installable from the browser, works offline
 - **Firebase Auth** — email/password login, data synced per user
+- **Soft Dark UI** — glassmorphism design with purple accent
 
 ---
 
@@ -30,7 +32,7 @@ An AI-powered expense tracker PWA built for Filipinos. Track your spending, get 
 | Auth + DB | Firebase Auth + Firestore |
 | PWA | vite-plugin-pwa + Workbox |
 | Backend | Python FastAPI |
-| AI | Google Gemini 1.5 Flash |
+| AI | Llama 3 via Groq API (free) |
 | Deploy | Vercel (frontend) + Render (backend) |
 
 ---
@@ -40,9 +42,9 @@ An AI-powered expense tracker PWA built for Filipinos. Track your spending, get 
 ```
 gastador/
 ├── src/
-│   ├── pages/          # Dashboard, AddExpense, History, Insights, Login
+│   ├── pages/          # Dashboard, AddExpense, History, Insights, Login, Profile
 │   ├── components/     # Navbar, ExpenseCard, SpendingChart, InsightCard, etc.
-│   ├── hooks/          # useExpenses, useInsights, useAuth
+│   ├── hooks/          # useExpenses, useInsights, useAuth, useInstallPrompt
 │   ├── services/       # firebase.ts, ai.ts, categorizer.ts
 │   ├── store/          # Zustand expense store
 │   └── constants/      # categories, theme
@@ -64,18 +66,13 @@ gastador/
 - Node.js 18+
 - Python 3.11+
 - Firebase project
-- Google Gemini API key (free at [aistudio.google.com](https://aistudio.google.com))
+- Groq API key (free at [console.groq.com](https://console.groq.com))
 
 ### Frontend
 
 ```bash
-# Install dependencies
 npm install
-
-# Copy and fill in env vars
-cp .env.example .env
-
-# Start dev server
+cp .env.example .env   # fill in Firebase + API values
 npm run dev
 ```
 
@@ -83,14 +80,8 @@ npm run dev
 
 ```bash
 cd backend
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Copy and fill in env vars
-cp .env.example .env
-
-# Start server
+cp .env.example .env   # fill in GROQ_API_KEY
 uvicorn main:app --reload
 ```
 
@@ -115,7 +106,7 @@ VITE_API_BASE_URL=http://localhost:8000
 ### Backend (`backend/.env`)
 
 ```env
-GEMINI_API_KEY=
+GROQ_API_KEY=
 ALLOWED_ORIGIN=*
 ```
 
@@ -127,14 +118,16 @@ ALLOWED_ORIGIN=*
 1. Push to GitHub
 2. Import repo on [vercel.com](https://vercel.com)
 3. Add all `VITE_*` env vars in project settings
-4. Deploy — Vercel auto-detects Vite
+4. Disable **Deployment Protection** (Settings → Deployment Protection → off) so the PWA manifest loads correctly
+5. Deploy — Vercel auto-detects Vite
 
 ### Backend → Render
 1. New Web Service → connect repo
 2. Root directory: `backend`
 3. Build command: `pip install -r requirements.txt`
 4. Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-5. Add `GEMINI_API_KEY` and `ALLOWED_ORIGIN` env vars
+5. Add `GROQ_API_KEY` and `ALLOWED_ORIGIN` env vars
+6. Set runtime to **Python 3.11** (not 3.14+)
 
 ---
 

@@ -1,15 +1,16 @@
 import { useState, useMemo } from 'react'
 import { useExpenses } from '../hooks/useExpenses'
 import { useIncome } from '../hooks/useIncome'
+import { EditTransactionModal, type EditTarget } from '../components/EditTransactionModal'
 import { useExpenseStore } from '../store/expenseStore'
 import { ExpenseCard } from '../components/ExpenseCard'
 import { MonthPicker } from '../components/MonthPicker'
 import { CATEGORIES, type Category } from '../constants/categories'
 import type { IncomeEntry } from '../store/expenseStore'
 
-function IncomeRow({ entry, onDelete }: { entry: IncomeEntry; onDelete: (id: string) => void }) {
+function IncomeRow({ entry, onDelete, onEdit }: { entry: IncomeEntry; onDelete: (id: string) => void; onEdit: (entry: IncomeEntry) => void }) {
   return (
-    <div className="flex items-center gap-3 px-4 py-3.5 bg-bg-elevated">
+    <div className="flex items-center gap-3 px-4 py-3.5 bg-bg-elevated" onClick={() => onEdit(entry)}>
       <div className="w-0.5 self-stretch rounded-full flex-shrink-0 my-0.5 bg-success" />
       <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 bg-success/10">
         💰
@@ -20,11 +21,14 @@ function IncomeRow({ entry, onDelete }: { entry: IncomeEntry; onDelete: (id: str
       </div>
       <div className="flex items-center gap-2">
         <p className="text-success font-semibold text-sm">+₱{entry.amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-        <button onClick={() => onDelete(entry.id)} className="text-text-3 hover:text-danger transition-colors p-1">
+        <button onClick={(e) => { e.stopPropagation(); onDelete(entry.id) }} className="text-text-3 hover:text-danger transition-colors p-1">
           <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M9 6V4h6v2" />
           </svg>
         </button>
+        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-text-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
       </div>
     </div>
   )
@@ -41,8 +45,9 @@ function formatGroupDate(date: Date): string {
 }
 
 export default function History() {
-  const { expenses, deleteExpense } = useExpenses()
-  const { income, deleteIncome } = useIncome()
+  const { expenses, deleteExpense, updateExpense } = useExpenses()
+  const { income, deleteIncome, updateIncome } = useIncome()
+  const [editTarget, setEditTarget] = useState<EditTarget | null>(null)
   const { selectedMonth } = useExpenseStore()
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState<Category | null>(null)
@@ -161,9 +166,11 @@ export default function History() {
               <div className="bg-bg-elevated rounded-2xl border border-border overflow-hidden divide-y divide-border/50">
                 {rows.map((row) =>
                   row.kind === 'expense' ? (
-                    <ExpenseCard key={row.data.id} expense={row.data} onDelete={deleteExpense} />
+                    <ExpenseCard key={row.data.id} expense={row.data} onDelete={deleteExpense}
+                      onEdit={(exp) => setEditTarget({ type: 'expense', data: exp })} />
                   ) : (
-                    <IncomeRow key={row.data.id} entry={row.data} onDelete={deleteIncome} />
+                    <IncomeRow key={row.data.id} entry={row.data} onDelete={deleteIncome}
+                      onEdit={(entry) => setEditTarget({ type: 'income', data: entry })} />
                   )
                 )}
               </div>
@@ -171,6 +178,15 @@ export default function History() {
           ))
         )}
       </div>
+
+      {editTarget && (
+        <EditTransactionModal
+          target={editTarget}
+          onClose={() => setEditTarget(null)}
+          updateExpense={updateExpense}
+          updateIncome={updateIncome}
+        />
+      )}
 
       {/* Pinned summary bar */}
       {allRows.length > 0 && (

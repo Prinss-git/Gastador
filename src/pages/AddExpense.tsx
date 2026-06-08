@@ -218,7 +218,7 @@ export default function AddExpense() {
           {KEYS.flat().map((key) => (
             <button key={key} onPointerDown={() => handleKey(key)}
               className="flex items-center justify-center rounded-2xl bg-bg-elevated border border-border
-                         text-text-1 font-medium text-xl
+                         text-text-1 font-semibold text-3xl
                          transition-all duration-75 active:scale-95 active:bg-surface select-none">
               {key === '⌫' ? (
                 <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">

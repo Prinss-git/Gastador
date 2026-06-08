@@ -11,6 +11,7 @@ export function useInstallPrompt() {
   const [isDismissed, setIsDismissed] = useState(
     () => localStorage.getItem('pwa-dismissed') === 'true'
   )
+
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
   const isInStandaloneMode =
     window.matchMedia('(display-mode: standalone)').matches ||
@@ -21,7 +22,7 @@ export function useInstallPrompt() {
 
     const handler = (e: Event) => {
       e.preventDefault()
-      // If browser offers the prompt again, reset dismiss so banner reappears
+      // When the browser re-offers the prompt, clear any prior dismissal
       setIsDismissed(false)
       localStorage.removeItem('pwa-dismissed')
       setInstallPrompt(e as BeforeInstallPromptEvent)
@@ -46,11 +47,15 @@ export function useInstallPrompt() {
     localStorage.setItem('pwa-dismissed', 'true')
   }
 
+  // Show banner if: not installed, not dismissed, and either prompt is ready OR on iOS
   const showBanner =
     !isInstalled &&
     !isDismissed &&
-    (installPrompt !== null || isIOS) &&
-    !isInStandaloneMode
+    !isInStandaloneMode &&
+    (installPrompt !== null || isIOS)
 
-  return { install, dismiss, showBanner, isIOS, isInstalled }
+  // Show install hint in profile if not installed (even without prompt — show manual instructions)
+  const canInstall = !isInstalled && !isInStandaloneMode
+
+  return { install, dismiss, showBanner, canInstall, isIOS, isInstalled, hasPrompt: installPrompt !== null }
 }

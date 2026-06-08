@@ -25,7 +25,7 @@ export default function Profile() {
   const [budgetInput, setBudgetInput] = useState(String(budget.limit))
   const [editingBudget, setEditingBudget] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
-  const { install, showBanner, isIOS, isInstalled } = useInstallPrompt()
+  const { install, showBanner, canInstall, isIOS, isInstalled, hasPrompt } = useInstallPrompt()
 
   const initials = (user?.email?.slice(0, 2) ?? 'GU').toUpperCase()
   const email = user?.email ?? ''
@@ -133,17 +133,33 @@ export default function Profile() {
           <RowItem label="Install status" value={isInstalled ? 'Installed ✓' : 'Not installed'} />
         </div>
 
-        {/* Install button — only shown when prompt is available and not yet installed */}
-        {showBanner && !isIOS && (
-          <button onClick={install}
-            className="w-full py-3.5 rounded-2xl text-sm font-semibold text-primary border border-primary/30 bg-primary/8
-                       transition-all active:scale-[0.98]">
-            Install Gastador App
-          </button>
+        {/* Install section */}
+        {canInstall && (
+          <div className="bg-bg-elevated rounded-2xl border border-primary/30 overflow-hidden">
+            <div className="px-4 py-3 border-b border-border/50">
+              <p className="text-text-1 text-sm font-semibold">Install App</p>
+              <p className="text-text-3 text-xs mt-0.5">Add Gastador to your home screen</p>
+            </div>
+            {isIOS ? (
+              <div className="px-4 py-3.5 text-text-2 text-sm">
+                Tap the <span className="text-text-1 font-semibold">Share</span> button in Safari, then tap <span className="text-text-1 font-semibold">"Add to Home Screen"</span>
+              </div>
+            ) : hasPrompt ? (
+              <button onClick={install}
+                className="w-full px-4 py-3.5 text-primary font-semibold text-sm text-left transition-colors hover:bg-primary/5 active:bg-primary/10">
+                Tap to install →
+              </button>
+            ) : (
+              <div className="px-4 py-3.5 text-text-2 text-sm leading-relaxed">
+                Open the browser menu (⋮) and tap <span className="text-text-1 font-semibold">"Add to Home Screen"</span> or <span className="text-text-1 font-semibold">"Install app"</span>
+              </div>
+            )}
+          </div>
         )}
-        {showBanner && isIOS && (
-          <div className="rounded-2xl border border-border bg-bg-elevated px-4 py-3.5 text-center">
-            <p className="text-text-2 text-sm">To install: tap Share → "Add to Home Screen"</p>
+        {isInstalled && (
+          <div className="rounded-2xl border border-success/30 bg-success/5 px-4 py-3 flex items-center gap-3">
+            <span className="text-success text-lg">✓</span>
+            <p className="text-success text-sm font-medium">App is installed</p>
           </div>
         )}
 

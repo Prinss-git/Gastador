@@ -7,6 +7,7 @@ import {
   onSnapshot,
   addDoc,
   deleteDoc,
+  updateDoc,
   doc,
   Timestamp,
   setDoc,
@@ -130,6 +131,27 @@ export function useExpenses() {
     [user, expenses, budget, selectedMonth, removeExpense, setBudget]
   )
 
+  const updateExpense = useCallback(
+    async (id: string, data: Partial<Omit<Expense, 'id'>>) => {
+      if (!user) return
+      try {
+        const ref = doc(db, 'users', user.uid, 'expenses', id)
+        const updates: Record<string, unknown> = {}
+        if (data.description !== undefined) updates.description = data.description
+        if (data.amount !== undefined) updates.amount = data.amount
+        if (data.category !== undefined) updates.category = data.category
+        if (data.date !== undefined) updates.date = Timestamp.fromDate(data.date)
+        if (data.notes !== undefined) updates.notes = data.notes
+        await updateDoc(ref, updates)
+        toast.success('Expense updated')
+      } catch {
+        toast.error('Failed to update')
+        throw new Error('update failed')
+      }
+    },
+    [user]
+  )
+
   const updateBudgetLimit = useCallback(
     async (limit: number) => {
       if (!user) return
@@ -148,5 +170,5 @@ export function useExpenses() {
     [user, budget, selectedMonth, setBudget]
   )
 
-  return { expenses, budget, saveExpense, deleteExpense, updateBudgetLimit }
+  return { expenses, budget, saveExpense, deleteExpense, updateExpense, updateBudgetLimit }
 }

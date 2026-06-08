@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import {
   collection, query, where, orderBy, onSnapshot,
-  addDoc, deleteDoc, doc, Timestamp,
+  addDoc, deleteDoc, updateDoc, doc, Timestamp,
 } from 'firebase/firestore'
 import { toast } from 'react-hot-toast'
 import { db } from '../services/firebase'
@@ -56,6 +56,23 @@ export function useIncome() {
     }
   }, [user, addIncomeEntry])
 
+  const updateIncome = useCallback(async (id: string, data: Partial<Omit<IncomeEntry, 'id'>>) => {
+    if (!user) return
+    try {
+      const ref = doc(db, 'users', user.uid, 'income', id)
+      const updates: Record<string, unknown> = {}
+      if (data.description !== undefined) updates.description = data.description
+      if (data.amount !== undefined) updates.amount = data.amount
+      if (data.date !== undefined) updates.date = Timestamp.fromDate(data.date)
+      if (data.notes !== undefined) updates.notes = data.notes
+      await updateDoc(ref, updates)
+      toast.success('Entry updated')
+    } catch {
+      toast.error('Failed to update')
+      throw new Error('update failed')
+    }
+  }, [user])
+
   const deleteIncome = useCallback(async (id: string) => {
     if (!user) return
     try {
@@ -67,5 +84,5 @@ export function useIncome() {
     }
   }, [user, removeIncomeEntry])
 
-  return { income, saveIncome, deleteIncome }
+  return { income, saveIncome, deleteIncome, updateIncome }
 }

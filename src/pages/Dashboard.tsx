@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useExpenses } from '../hooks/useExpenses'
 import { useIncome } from '../hooks/useIncome'
@@ -10,14 +10,16 @@ import { ExpenseCard } from '../components/ExpenseCard'
 import { InsightCard } from '../components/InsightCard'
 import { SkeletonCard } from '../components/SkeletonLoader'
 import { InstallBanner } from '../components/InstallBanner'
+import { EditTransactionModal, type EditTarget } from '../components/EditTransactionModal'
 import { CATEGORY_EMOJIS, type Category } from '../constants/categories'
 
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const { expenses, deleteExpense } = useExpenses()
-  const { income } = useIncome()
+  const { expenses, deleteExpense, updateExpense } = useExpenses()
+  const { income, updateIncome } = useIncome()
+  const [editTarget, setEditTarget] = useState<EditTarget | null>(null)
   const { selectedMonth } = useExpenseStore()
   const { insights, loading: insightsLoading, loadInsights } = useInsights()
 
@@ -164,7 +166,10 @@ export default function Dashboard() {
         </div>
       ) : (
         <div className="mx-5 bg-bg-elevated rounded-2xl border border-border overflow-hidden divide-y divide-border/50">
-          {recent.map((e) => <ExpenseCard key={e.id} expense={e} onDelete={deleteExpense} />)}
+          {recent.map((e) => (
+            <ExpenseCard key={e.id} expense={e} onDelete={deleteExpense}
+              onEdit={(exp) => setEditTarget({ type: 'expense', data: exp })} />
+          ))}
         </div>
       )}
 
@@ -188,6 +193,14 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+      )}
+      {editTarget && (
+        <EditTransactionModal
+          target={editTarget}
+          onClose={() => setEditTarget(null)}
+          updateExpense={updateExpense}
+          updateIncome={updateIncome}
+        />
       )}
     </div>
   )

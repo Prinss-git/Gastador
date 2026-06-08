@@ -21,14 +21,13 @@ export default function Dashboard() {
   const { income, updateIncome } = useIncome()
   const [editTarget, setEditTarget] = useState<EditTarget | null>(null)
   const { selectedMonth } = useExpenseStore()
-  const { insights, loading: insightsLoading, loadInsights } = useInsights()
+  const { insights, loading: insightsLoading, error: insightsError, loadInsights } = useInsights()
 
   const totalSpent = expenses.reduce((s, e) => s + e.amount, 0)
   const totalIncome = income.reduce((s, e) => s + e.amount, 0)
   const hasIncome = totalIncome > 0
   const balance = totalIncome - totalSpent
   const pct = totalIncome > 0 ? Math.min((totalSpent / totalIncome) * 100, 100) : 0
-  const [year, month] = selectedMonth.split('-').map(Number)
 
   const categoryTotals = useMemo(() => {
     const map: Record<string, number> = {}
@@ -36,12 +35,14 @@ export default function Dashboard() {
     return Object.entries(map).sort((a, b) => b[1] - a[1]) as [Category, number][]
   }, [expenses])
 
-  const total = totalSpent // keep alias for insights call below
   const recent = expenses.slice(0, 5)
+  const expensesLoaded = expenses.length > 0
 
+  // Trigger when month changes OR when expenses first load from Firestore
   useEffect(() => {
-    if (expenses.length > 0) loadInsights(selectedMonth, expenses, totalSpent, totalIncome, 0)
-  }, [selectedMonth]) // eslint-disable-line
+    if (!expensesLoaded) return
+    loadInsights(selectedMonth, expenses, totalSpent, totalIncome, 0)
+  }, [selectedMonth, expensesLoaded]) // eslint-disable-line
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
@@ -178,16 +179,32 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ── AI Insights (1–2 cards) ── */}
-      {(insightsLoading || insights.length > 0) && (
+      {/* ── AI Insights ── */}
+      {expensesLoaded && (
         <div className="px-5 mt-6">
-          <div className="flex items-center gap-2 mb-3">
-            <p className="text-text-1 text-sm font-semibold">AI Insights</p>
-            <span className="text-[10px] text-text-3 font-medium bg-surface rounded-full px-2 py-0.5">Groq</span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <p className="text-text-1 text-sm font-semibold">AI Insights</p>
+              <span className="text-[10px] text-text-3 font-medium bg-surface rounded-full px-2 py-0.5">Groq</span>
+            </div>
+            {insightsError && (
+              <button onClick={() => loadInsights(selectedMonth, expenses, totalSpent, totalIncome, 0)}
+                className="text-primary text-xs font-medium">
+                Retry
+              </button>
+            )}
           </div>
           {insightsLoading ? (
             <div className="space-y-2"><SkeletonCard /><SkeletonCard /></div>
-          ) : (
+          ) : insightsError ? (
+            <div className="bg-bg-elevated rounded-2xl border border-border px-4 py-3.5 flex items-center gap-3">
+              <span className="text-warning text-lg flex-shrink-0">⚠️</span>
+              <div className="min-w-0">
+                <p className="text-text-2 text-xs font-medium">AI unavailable</p>
+                <p className="text-text-3 text-[11px] mt-0.5 truncate">{insightsError}</p>
+              </div>
+            </div>
+          ) : insights.length > 0 ? (
             <div className="space-y-2">
               {insights.slice(0, 2).map((ins, i) => <InsightCard key={i} insight={ins} />)}
               {insights.length > 2 && (
@@ -196,7 +213,7 @@ export default function Dashboard() {
                 </Link>
               )}
             </div>
-          )}
+          ) : null}
         </div>
       )}
       {editTarget && (

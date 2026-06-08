@@ -36,7 +36,7 @@ export default function Insights() {
   return (
     <div className="pb-32 min-h-screen bg-bg overflow-x-hidden animate-fade-in">
       {/* Header */}
-      <div className="px-5 pt-14 pb-6">
+      <div className="px-5 pb-6" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-text-1 text-xl font-bold">Insights</h1>

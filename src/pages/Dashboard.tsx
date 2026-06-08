@@ -51,7 +51,8 @@ export default function Dashboard() {
     <div className="pb-36 min-h-screen bg-bg animate-fade-in overflow-x-hidden">
 
       {/* ── Top bar ── */}
-      <div className="flex items-center justify-between px-5 pt-12 pb-2">
+      <div className="flex items-center justify-between px-5 pb-2"
+        style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center text-sm shadow-primary-sm">💸</div>
           <span className="text-text-1 font-bold text-base tracking-tight">Gastador</span>

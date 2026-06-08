@@ -124,7 +124,8 @@ export default function AddExpense() {
   return (
     <div className="flex flex-col min-h-screen bg-bg overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 pt-12 pb-4">
+      <div className="flex items-center gap-3 px-5 pb-4"
+        style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
         <button onClick={() => navigate(-1)}
           className="w-8 h-8 rounded-xl bg-bg-elevated border border-border flex items-center justify-center text-text-2">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-4 h-4">

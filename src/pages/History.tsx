@@ -93,7 +93,7 @@ export default function History() {
   return (
     <div className="pb-40 min-h-screen bg-bg overflow-x-hidden animate-fade-in">
       {/* Header */}
-      <div className="px-5 pt-14 pb-4">
+      <div className="px-5 pb-4" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
         <div className="flex items-center justify-between mb-5">
           <h1 className="text-text-1 text-xl font-bold">History</h1>
           <MonthPicker />

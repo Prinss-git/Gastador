@@ -39,9 +39,10 @@ export default function Login() {
 
         {/* Logo */}
         <div className="flex items-center gap-3 relative">
-          <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-xl shadow-primary-sm">
-            💸
-          </div>
+          <svg width="40" height="40" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+            <rect width="28" height="28" rx="8" fill="#7C6FFF"/>
+            <path d="M19.5 10.8C18.4 9.1 16.4 8 14 8C10.7 8 8 10.7 8 14C8 17.3 10.7 20 14 20C16.8 20 19.1 18.1 19.8 15.5H14V13.5H22V14C22 18.4 18.4 22 14 22C9.6 22 6 18.4 6 14C6 9.6 9.6 6 14 6C16.9 6 19.5 7.5 21 9.8L19.5 10.8Z" fill="white"/>
+          </svg>
           <span className="text-text-1 text-xl font-bold tracking-tight">Gastador</span>
         </div>
 
@@ -72,9 +73,10 @@ export default function Login() {
       <div className="flex flex-col justify-center flex-1 px-6 lg:px-16 py-16 lg:max-w-md lg:mx-auto w-full relative">
         {/* Mobile logo */}
         <div className="lg:hidden flex items-center gap-3 mb-12">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-lg shadow-primary-sm">
-            💸
-          </div>
+          <svg width="36" height="36" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+            <rect width="28" height="28" rx="8" fill="#7C6FFF"/>
+            <path d="M19.5 10.8C18.4 9.1 16.4 8 14 8C10.7 8 8 10.7 8 14C8 17.3 10.7 20 14 20C16.8 20 19.1 18.1 19.8 15.5H14V13.5H22V14C22 18.4 18.4 22 14 22C9.6 22 6 18.4 6 14C6 9.6 9.6 6 14 6C16.9 6 19.5 7.5 21 9.8L19.5 10.8Z" fill="white"/>
+          </svg>
           <span className="text-text-1 text-lg font-bold tracking-tight">Gastador</span>
         </div>
 

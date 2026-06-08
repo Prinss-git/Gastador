@@ -36,9 +36,10 @@ export default function App() {
     return (
       <div className="min-h-screen bg-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-3xl shadow-primary">
-            💸
-          </div>
+          <svg width="64" height="64" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="28" height="28" rx="8" fill="#7C6FFF"/>
+            <path d="M19.5 10.8C18.4 9.1 16.4 8 14 8C10.7 8 8 10.7 8 14C8 17.3 10.7 20 14 20C16.8 20 19.1 18.1 19.8 15.5H14V13.5H22V14C22 18.4 18.4 22 14 22C9.6 22 6 18.4 6 14C6 9.6 9.6 6 14 6C16.9 6 19.5 7.5 21 9.8L19.5 10.8Z" fill="white"/>
+          </svg>
           <div className="w-5 h-5 border-2 border-primary/40 border-t-primary rounded-full animate-spin" />
         </div>
       </div>

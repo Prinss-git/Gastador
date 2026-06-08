@@ -21,7 +21,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* App column */}
       <div className="relative w-full max-w-app min-h-screen bg-bg overflow-x-hidden
-                      lg:border-x lg:border-border/60 lg:shadow-[0_0_60px_rgba(0,0,0,0.6)]">
+                      lg:border-x lg:border-t lg:border-border/60 lg:shadow-[0_0_60px_rgba(0,0,0,0.6)]">
         {children}
         <Navbar />
       </div>

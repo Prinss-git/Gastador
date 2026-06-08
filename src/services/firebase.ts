@@ -1,9 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore'
 
-// Paste your Firebase project config values here.
-// Get them from: Firebase Console > Project Settings > Your Apps > Web App > SDK setup
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -17,4 +15,16 @@ const app = initializeApp(firebaseConfig)
 
 export const auth = getAuth(app)
 export const db = getFirestore(app)
+
+// Enable offline persistence — writes queue locally and sync when back online
+enableIndexedDbPersistence(db).catch((err) => {
+  if (err.code === 'failed-precondition') {
+    // Multiple tabs open — persistence only works in one tab at a time
+    console.warn('Firestore persistence unavailable: multiple tabs open')
+  } else if (err.code === 'unimplemented') {
+    // Browser doesn't support IndexedDB
+    console.warn('Firestore persistence not supported in this browser')
+  }
+})
+
 export default app

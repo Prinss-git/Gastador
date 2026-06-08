@@ -33,6 +33,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Take over immediately — no waiting for old tabs to close
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/],
@@ -47,12 +50,8 @@ export default defineConfig({
           },
         ],
       },
-      devOptions: {
-        enabled: true,
-      },
+      devOptions: { enabled: false },
     }),
   ],
-  server: {
-    port: 5173,
-  },
+  server: { port: 5173 },
 })

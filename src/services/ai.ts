@@ -23,10 +23,7 @@ async function groq(prompt: string, maxTokens: number, temperature = 0): Promise
       temperature,
     }),
   })
-  if (!res.ok) {
-    const body = await res.text()
-    throw new Error(`Groq ${res.status}: ${body}`)
-  }
+  if (!res.ok) throw new Error(`Groq error ${res.status}`)
   const data = await res.json()
   return data.choices[0].message.content.trim()
 }

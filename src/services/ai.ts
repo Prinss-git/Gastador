@@ -17,7 +17,7 @@ async function groq(prompt: string, maxTokens: number, temperature = 0): Promise
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'llama3-8b-8192',
+      model: 'llama-3.1-8b-instant',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: maxTokens,
       temperature,

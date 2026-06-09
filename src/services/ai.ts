@@ -77,7 +77,7 @@ export async function fetchInsights(payload: InsightsPayload): Promise<Insight[]
     `Breakdown: ${breakdownStr}.\n` +
     `Top expenses:\n${top5Str}\n` +
     `Previous month total: ₱${payload.previousMonth.total.toFixed(2)}.\n\n` +
-    'Give exactly 3 short, practical, friendly money-saving insights in Filipino/PH context. Max 2 sentences each.\n' +
+    'Give exactly 3 short, practical, friendly money-saving insights. Respond in English only. Max 2 sentences each.\n' +
     'Return ONLY a JSON array: [{"title": string, "body": string, "emoji": string}]'
 
   const raw = await groq(prompt, 512, 0.7)

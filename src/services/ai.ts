@@ -18,7 +18,10 @@ async function groq(prompt: string, maxTokens: number, temperature = 0): Promise
     },
     body: JSON.stringify({
       model: 'llama-3.1-8b-instant',
-      messages: [{ role: 'user', content: prompt }],
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant. Always respond in English only. Never use Filipino, Tagalog, or any other language.' },
+        { role: 'user', content: prompt },
+      ],
       max_tokens: maxTokens,
       temperature,
     }),

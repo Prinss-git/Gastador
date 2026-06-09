@@ -8,7 +8,7 @@ const VALID_CATEGORIES = new Set([
   'Food', 'Transport', 'Shopping', 'Bills', 'Health', 'Entertainment', 'Others',
 ])
 
-async function groq(prompt: string, maxTokens: number, temperature = 0): Promise<string> {
+async function groq(prompt: string, maxTokens: number, temperature = 0, model = 'llama-3.1-8b-instant'): Promise<string> {
   if (!GROQ_KEY) throw new Error('Groq API key not configured')
   const res = await fetch(GROQ_URL, {
     method: 'POST',
@@ -17,9 +17,9 @@ async function groq(prompt: string, maxTokens: number, temperature = 0): Promise
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
+      model,
       messages: [
-        { role: 'system', content: 'You are a helpful assistant. Always respond in English only. Never use Filipino, Tagalog, or any other language.' },
+        { role: 'system', content: 'You are a helpful financial assistant. You MUST respond in English only. This is mandatory. Never use Filipino, Tagalog, or any other language, regardless of the language of the input.' },
         { role: 'user', content: prompt },
       ],
       max_tokens: maxTokens,
@@ -80,10 +80,11 @@ export async function fetchInsights(payload: InsightsPayload): Promise<Insight[]
     `Breakdown: ${breakdownStr}.\n` +
     `Top expenses:\n${top5Str}\n` +
     `Previous month total: ₱${payload.previousMonth.total.toFixed(2)}.\n\n` +
-    'Give exactly 3 short, practical, friendly money-saving insights. Respond in English only. Max 2 sentences each.\n' +
+    'Give exactly 3 short, practical, friendly money-saving insights. Max 2 sentences each.\n' +
+    'IMPORTANT: Write in English only. Do not use Filipino or Tagalog.\n' +
     'Return ONLY a JSON array: [{"title": string, "body": string, "emoji": string}]'
 
-  const raw = await groq(prompt, 512, 0.7)
+  const raw = await groq(prompt, 512, 0.7, 'llama-3.3-70b-versatile')
 
   // Strip markdown code fences if present
   const cleaned = raw.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
